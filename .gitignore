@@ -18,8 +18,8 @@ build/
 # ===== Editor / IDE =====
 .vscode/
 
-# ===== Documentación Markdown (no se sube) =====
-*.md
+# ===== Documentación =====
+# Los .md de documentación (README, guías) SÍ se versionan.
 
 # ===== Archivos de Claude / asistentes =====
 .claude/
