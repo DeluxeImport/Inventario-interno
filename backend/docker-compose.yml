@@ -1,0 +1,24 @@
+# PostgreSQL para el Sistema de Inventario.
+# Uso:  docker compose up -d   (levanta la base)   |   docker compose down   (la detiene)
+# Los datos persisten en el volumen `inventario_pgdata` aunque apagues el contenedor.
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: inventario_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: inventario
+      POSTGRES_PASSWORD: inventario_local_pass # cámbiala en producción
+      POSTGRES_DB: inventario
+    ports:
+      - '5432:5432'
+    volumes:
+      - inventario_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U inventario -d inventario']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  inventario_pgdata:

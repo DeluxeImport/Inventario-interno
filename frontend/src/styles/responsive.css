@@ -1,0 +1,707 @@
+/* ============================================
+   RESPONSIVE FLUIDO - InventarioUtileria
+   Mobile-first: estilos base = móvil
+   Cards para tablas en móvil (no scroll horizontal)
+   ============================================ */
+
+/* ---- HAMBURGER MENU ---- */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 0;
+  background: var(--panel);
+  padding: 0.625rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  z-index: 100;
+  min-width: 44px;
+  min-height: 44px;
+  gap: 4px;
+}
+
+.hamburger span {
+  display: block;
+  width: 1.25rem;
+  height: 2px;
+  background: var(--ink);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  border-radius: 2px;
+}
+
+.hamburger.active span:nth-child(1) {
+  transform: rotate(45deg) translate(4px, 4px);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(4px, -4px);
+}
+
+/* ---- NAV ---- */
+nav {
+  display: none;
+  flex-direction: column;
+  background: var(--panel);
+  padding: var(--sp-sm);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  gap: var(--sp-2xs);
+  width: 100%;
+}
+
+nav.open {
+  display: flex;
+}
+
+nav button {
+  width: 100%;
+  text-align: left;
+  padding: var(--sp-md);
+  border-radius: var(--radius-md);
+  min-height: 44px;
+}
+
+/* ============================================
+   MÓVIL BASE (< 640px)
+   ============================================ */
+
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--sp-md);
+  padding: var(--sp-md) 0;
+  position: relative;
+}
+
+.brand {
+  justify-content: center;
+  text-align: center;
+}
+
+.brand h1 {
+  font-size: var(--fs-xl);
+}
+
+.brand p {
+  display: none;
+}
+
+.logo {
+  font-size: var(--fs-2xl);
+}
+
+.user-box {
+  justify-content: center;
+  gap: var(--sp-sm);
+}
+
+.user-info {
+  display: none;
+}
+
+.app {
+  padding: 0 var(--sp-md) var(--sp-xl);
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+  margin-bottom: var(--sp-md);
+}
+
+.toolbar .btn {
+  width: 100%;
+}
+
+.search {
+  width: 100%;
+}
+
+/* Dashboard cards */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-sm);
+  margin-bottom: var(--sp-sm);
+}
+
+.card {
+  padding: var(--sp-md);
+}
+
+.card-num {
+  font-size: var(--fs-2xl);
+}
+
+/* Tickets grid */
+.tickets-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-md);
+}
+
+/* Modales */
+.modal {
+  max-width: 100%;
+  margin: var(--sp-sm);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+.modal-wide {
+  max-width: 100%;
+}
+
+.modal-overlay {
+  padding: var(--sp-sm);
+  padding-top: var(--sp-lg);
+  align-items: flex-start;
+}
+
+.form {
+  padding: var(--sp-md);
+}
+
+.modal-head {
+  padding: var(--sp-md);
+}
+
+.grid3 {
+  grid-template-columns: 1fr;
+}
+
+.grid2 {
+  grid-template-columns: 1fr;
+}
+
+/* Chips */
+.chips {
+  display: flex;
+  gap: var(--sp-xs);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: var(--sp-2xs);
+  -webkit-overflow-scrolling: touch;
+}
+
+.chip {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Ticket items */
+.ticket-items li {
+  flex-direction: column;
+  gap: var(--sp-2xs);
+}
+
+.proc-row {
+  flex-wrap: wrap;
+}
+
+.proc-name {
+  min-width: 100%;
+  margin-bottom: var(--sp-2xs);
+}
+
+.cart-row {
+  flex-wrap: wrap;
+}
+
+.cart-name {
+  min-width: 100%;
+}
+
+.login-card {
+  padding: var(--sp-xl) var(--sp-lg);
+  margin: var(--sp-md);
+}
+
+.login-logo {
+  font-size: var(--fs-3xl);
+}
+
+.seg {
+  flex-direction: column;
+}
+
+.seg button {
+  width: 100%;
+}
+
+.ticket-actions {
+  flex-direction: column;
+}
+
+.ticket-actions .btn {
+  width: 100%;
+}
+
+.proc-foot {
+  flex-wrap: wrap;
+}
+
+.proc-foot .btn {
+  flex: 1;
+  min-width: 100%;
+}
+
+.subnav {
+  flex-direction: column;
+}
+
+.subnav button {
+  width: 100%;
+}
+
+/* ============================================
+   TABLE CARDS - Tablas como tarjetas en móvil
+   ============================================ */
+
+/* Ocultar encabezado de tabla en móvil */
+.table-wrap thead {
+  display: none;
+}
+
+/* Cada fila se convierte en tarjeta */
+.table-wrap tbody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+  padding: var(--sp-sm);
+}
+
+/* Cada tr se convierte en card */
+.table-wrap tr {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-xs);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Cada td se convierte en label + valor.
+   Importante: forzamos text-align:left para que la clase .num (text-align:right,
+   usada en escritorio) no descoloque la etiqueta dentro de la tarjeta. El valor se
+   alinea a la derecha mediante el flex (justify-content + text-align del valor). */
+.table-wrap td {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  padding: var(--sp-sm) 0;
+  border-bottom: 1px solid var(--line);
+  white-space: normal;
+  gap: var(--sp-md);
+  color: var(--ink);
+}
+
+.table-wrap tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Label de cada celda — pegada a la izquierda (text-align:left contrarresta .num).
+   El valor queda a la derecha por el justify-content: space-between del td. */
+.table-wrap td::before {
+  content: attr(data-label);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  text-align: left;
+  min-width: 35%;
+}
+
+.table-wrap td.num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* Celdas sin etiqueta (p. ej. fila "Sin resultados"): centradas, sin label vacía */
+.table-wrap td:not([data-label]) {
+  justify-content: center;
+  text-align: center;
+}
+
+.table-wrap td:not([data-label])::before {
+  display: none;
+}
+
+/* ============================================
+   FICHA DE STOCK 2×2 — solo tabla de inventario, móvil
+   Las 4 cifras (Completo/Incompleto/Total/Mínimo) se agrupan en mosaicos
+   en vez de ocupar 4 filas completas, dejando la tarjeta más compacta.
+   ============================================ */
+.tbl-stock tr {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-xs) var(--sp-sm);
+  align-items: stretch;
+}
+
+/* Por defecto cada celda ocupa el ancho completo (etiqueta izq. / valor der.) */
+.tbl-stock td {
+  grid-column: 1 / -1;
+}
+
+/* Las celdas numéricas pasan a ser mosaicos de media columna (2×2) */
+.tbl-stock td.num {
+  grid-column: span 1;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  text-align: left;
+  padding: var(--sp-sm) var(--sp-md);
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-xl);
+  line-height: 1.1;
+}
+
+.tbl-stock td.num::before {
+  flex: none;
+  align-self: flex-start;
+}
+
+/* Destacar el TOTAL (lleva además la clase .strong) */
+.tbl-stock td.num.strong {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: var(--primary-dark);
+}
+
+/* Primera celda = título de la tarjeta */
+.table-wrap td:first-child {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--line);
+  padding-bottom: var(--sp-sm);
+}
+
+.table-wrap td:first-child::before {
+  display: none;
+}
+
+/* Acciones al final, apiladas */
+.table-wrap td:last-child {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--sp-xs);
+  border-top: 1px solid var(--line);
+  padding-top: var(--sp-sm);
+  margin-top: var(--sp-xs);
+}
+
+.table-wrap td:last-child::before {
+  display: none;
+}
+
+.table-wrap .actions {
+  flex-direction: column;
+}
+
+.table-wrap .actions .btn {
+  width: 100%;
+}
+
+/* Alternar color de filas como cards */
+.table-wrap tr:nth-child(even) {
+  background: #fafbfc;
+}
+
+/* ============================================
+   TABLET (min-width: 640px)
+   ============================================ */
+@media (min-width: 640px) {
+  .hamburger {
+    display: none;
+  }
+
+  nav {
+    display: flex;
+    flex-direction: row;
+    position: static;
+    width: auto;
+    gap: var(--sp-2xs);
+    padding: 0.3125rem;
+  }
+
+  nav button {
+    width: auto;
+    white-space: nowrap;
+  }
+
+  header {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--sp-md);
+  }
+
+  .brand {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .brand p {
+    display: block;
+  }
+
+  .user-box {
+    justify-content: flex-end;
+    margin-left: auto;
+  }
+
+  .user-info {
+    display: flex;
+  }
+
+  .toolbar {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .toolbar .btn {
+    width: auto;
+  }
+
+  .search {
+    min-width: min(250px, 40%);
+    flex: 1;
+  }
+
+  .cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .tickets-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  }
+
+  .modal {
+    max-width: clamp(20rem, 80vw, 28.75rem);
+    margin: 0 auto;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .modal-wide {
+    max-width: clamp(22rem, 85vw, 33.75rem);
+  }
+
+  .modal-overlay {
+    padding: var(--sp-lg);
+    align-items: center;
+    padding-top: var(--sp-lg);
+  }
+
+  .grid3 {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+  }
+
+  .grid2 {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  }
+
+  .chips {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+
+  .chip {
+    white-space: normal;
+  }
+
+  .ticket-items li {
+    flex-direction: row;
+  }
+
+  .proc-row {
+    flex-wrap: nowrap;
+  }
+
+  .proc-name {
+    min-width: auto;
+    margin-bottom: 0;
+  }
+
+  .cart-row {
+    flex-wrap: nowrap;
+  }
+
+  .cart-name {
+    min-width: auto;
+  }
+
+  .seg {
+    flex-direction: row;
+  }
+
+  .seg button {
+    width: auto;
+  }
+
+  .ticket-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .ticket-actions .btn {
+    width: auto;
+  }
+
+  .proc-foot {
+    flex-wrap: nowrap;
+  }
+
+  .proc-foot .btn {
+    min-width: auto;
+  }
+
+  .subnav {
+    flex-direction: row;
+  }
+
+  .subnav button {
+    width: auto;
+  }
+
+  /* Restaurar tabla en desktop */
+  .table-wrap thead {
+    display: table-header-group;
+  }
+
+  .table-wrap tbody {
+    display: table-row-group;
+    gap: 0;
+    padding: 0;
+  }
+
+  .table-wrap tr {
+    display: table-row;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  .table-wrap td {
+    display: table-cell;
+    justify-content: flex-start;
+    padding: var(--sp-sm) var(--sp-md);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+    gap: 0;
+  }
+
+  .table-wrap td::before {
+    display: none;
+  }
+
+  .table-wrap td:first-child {
+    font-size: var(--fs-base);
+    font-weight: 400;
+    color: inherit;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .table-wrap td:last-child {
+    flex-direction: row;
+    align-items: center;
+    border-top: none;
+    padding-top: var(--sp-sm);
+    margin-top: 0;
+  }
+
+  .table-wrap .actions {
+    flex-direction: row;
+  }
+
+  .table-wrap .actions .btn {
+    width: auto;
+  }
+
+  .table-wrap tr:nth-child(even) {
+    background: transparent;
+  }
+
+  .table-wrap tbody tr:hover {
+    background: #f8fafc;
+  }
+}
+
+/* ============================================
+   DESKTOP (min-width: 1024px)
+   ============================================ */
+@media (min-width: 1024px) {
+  .app {
+    max-width: 75rem;
+    margin: 0 auto;
+  }
+}
+
+/* ============================================
+   UTILIDADES
+   ============================================ */
+@media (max-width: 639px) {
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  .app {
+    padding-bottom: calc(var(--sp-xl) + env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  .hamburger, nav, .user-box, .toolbar, .actions, .btn {
+    display: none !important;
+  }
+  
+  .app {
+    max-width: 100%;
+    padding: 0;
+  }
+  
+  .table-wrap thead {
+    display: table-header-group;
+  }
+  
+  .table-wrap tbody {
+    display: table-row-group;
+  }
+  
+  .table-wrap tr {
+    display: table-row;
+  }
+  
+  .table-wrap td {
+    display: table-cell;
+  }
+}

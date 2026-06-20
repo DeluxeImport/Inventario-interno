@@ -1,0 +1,37 @@
+# ===== Dependencias =====
+node_modules/
+
+# ===== Variables de entorno / secretos =====
+.env
+.env.local
+.env.*.local
+# (se conserva .env.example, que no contiene secretos)
+
+# ===== Base de datos local (SQLite) =====
+*.db
+*.db-journal
+
+# ===== Build / salida =====
+dist/
+build/
+
+# ===== Editor / IDE =====
+.vscode/
+
+# ===== Documentación Markdown (no se sube) =====
+*.md
+
+# ===== Archivos de Claude / asistentes =====
+.claude/
+CLAUDE.md
+MEMORY.md
+.cursor/
+
+# ===== Temporales de previsualización =====
+_preview_*
+
+# ===== Logs / Sistema operativo =====
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db

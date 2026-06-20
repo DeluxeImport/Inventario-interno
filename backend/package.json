@@ -1,0 +1,28 @@
+{
+  "name": "inventario-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node src/index.js",
+    "start": "node src/index.js",
+    "test": "node --test",
+    "seed": "node prisma/seed.js",
+    "seed:admin": "node prisma/seed_admin.js",
+    "seed:tiendas": "node prisma/seed_tiendas.js",
+    "seed:areas": "node prisma/seed_areas.js",
+    "db:setup": "prisma generate && prisma db push && node prisma/seed.js && node prisma/seed_admin.js && node prisma/seed_tiendas.js && node prisma/seed_areas.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
+    "jsonwebtoken": "^9.0.3",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  }
+}

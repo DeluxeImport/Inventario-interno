@@ -1,0 +1,6 @@
+/* Punto de entrada de estilos. El orden importa para la cascada:
+   tokens/átomos → estructura → componentes → responsive. */
+@import './base.css';
+@import './layout.css';
+@import './components.css';
+@import './responsive.css';

@@ -1,0 +1,259 @@
+/* Estructura general: contenedor, header/nav, caja de usuario, login. */
+/* Mobile-first: estilos base = móvil */
+
+/* App container - fluido */
+.app {
+  padding: 0 clamp(0.75rem, 3vw, 1rem) clamp(2rem, 5vw, 3rem);
+}
+
+@media (min-width: 1024px) {
+  .app {
+    max-width: 75rem;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1280px) {
+  .app {
+    max-width: 80rem;
+  }
+}
+
+/* Header - mobile first: apilado */
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(0.5rem, 2vw, 0.75rem);
+  padding: clamp(0.75rem, 3vw, 1.125rem) 0;
+}
+
+@media (min-width: 640px) {
+  header {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: clamp(0.5rem, 2vw, 0.75rem);
+  }
+}
+
+/* Brand - fluido */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+  justify-content: center;
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .brand {
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
+.logo {
+  font-size: clamp(1.5rem, 5vw, 2.125rem);
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: clamp(1rem, 4vw, 1.375rem);
+}
+
+.brand p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+
+/* Nav - mobile first: oculto, se muestra con hamburger */
+nav {
+  display: none;
+  flex-direction: column;
+  background: var(--panel);
+  padding: var(--sp-sm);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  gap: var(--sp-2xs);
+}
+
+@media (min-width: 640px) {
+  nav {
+    display: flex;
+    flex-direction: row;
+    position: static;
+    gap: 0.375rem;
+    padding: 0.3125rem;
+  }
+}
+
+nav button {
+  position: relative;
+  border: 0;
+  background: transparent;
+  padding: clamp(0.75rem, 3vw, 0.875rem) clamp(0.875rem, 3vw, 1rem);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  min-height: 44px;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+@media (min-width: 640px) {
+  nav button {
+    padding: clamp(0.5rem, 2vw, 0.625rem) clamp(0.875rem, 3vw, 1rem);
+    white-space: nowrap;
+  }
+}
+
+nav button.nav-on {
+  background: var(--primary);
+  color: #fff;
+}
+
+.dot {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.6875rem;
+  min-width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.25rem;
+}
+
+/* User box - mobile first: compacto */
+.user-box {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .user-box {
+    justify-content: flex-end;
+    gap: var(--sp-md);
+    margin-left: auto;
+  }
+}
+
+.user-info {
+  display: none;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  .user-info {
+    display: flex;
+  }
+}
+
+.user-info strong {
+  font-size: var(--fs-base);
+}
+
+.user-info span {
+  font-size: var(--fs-xs);
+  color: var(--muted);
+}
+
+/* Error bar - fluido */
+.error-bar {
+  background: #fee2e2;
+  color: var(--danger);
+  border: 1px solid #fecaca;
+  padding: var(--sp-sm) var(--sp-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--sp-md);
+  font-weight: 600;
+  font-size: var(--fs-base);
+}
+
+/* Login - fluido */
+.checking {
+  display: grid;
+  place-items: center;
+  height: 100vh;
+  color: var(--muted);
+  font-size: var(--fs-lg);
+}
+
+.login-wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  padding: var(--sp-lg);
+}
+
+.login-card {
+  background: #fff;
+  width: 100%;
+  max-width: clamp(20rem, 80vw, 23.75rem);
+  border-radius: var(--radius-xl);
+  padding: clamp(1.5rem, 5vw, 2.25rem) clamp(1.25rem, 4vw, 1.875rem);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+}
+
+.login-logo {
+  font-size: clamp(2rem, 8vw, 2.875rem);
+  text-align: center;
+}
+
+.login-card h1 {
+  margin: 0;
+  text-align: center;
+  font-size: var(--fs-xl);
+}
+
+.login-sub {
+  margin: 0 0 var(--sp-sm);
+  text-align: center;
+  color: var(--muted);
+  font-size: var(--fs-base);
+}
+
+.login-card label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-xs);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.login-card input {
+  width: 100%;
+}
+
+.login-btn {
+  margin-top: var(--sp-sm);
+  padding: var(--sp-md);
+  font-size: var(--fs-md);
+}
+
+.login-error {
+  background: #fee2e2;
+  color: var(--danger);
+  border: 1px solid #fecaca;
+  padding: var(--sp-sm) var(--sp-md);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  text-align: center;
+}

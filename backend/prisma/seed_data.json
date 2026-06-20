@@ -1,0 +1,562 @@
+[
+  {
+    "categoria": "Papelería",
+    "producto": "Rollos térmicos grande(POS)",
+    "unidad": "Unidad",
+    "stockCompleto": 9,
+    "stockIncompleto": 0,
+    "stockMinimo": 3
+  },
+  {
+    "categoria": "Papelería",
+    "producto": "Rollos térmicos pequeños(POS)",
+    "unidad": "Unidad",
+    "stockCompleto": 6,
+    "stockIncompleto": 0,
+    "stockMinimo": 3
+  },
+  {
+    "categoria": "Papelería",
+    "producto": "Hojas A4",
+    "unidad": "Paquete",
+    "stockCompleto": 4,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Papelería",
+    "producto": "Tableros",
+    "unidad": "Unidad",
+    "stockCompleto": 4,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Papelería",
+    "producto": "Catálogos de productos",
+    "unidad": "Unidad",
+    "stockCompleto": 9,
+    "stockIncompleto": 0,
+    "stockMinimo": 2
+  },
+  {
+    "categoria": "Papelería",
+    "producto": "Libreto pequeño",
+    "unidad": "Unidad",
+    "stockCompleto": 0,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Papelería",
+    "producto": "Libreto grande",
+    "unidad": "Unidad",
+    "stockCompleto": 0,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Papelería",
+    "producto": "Cuaderno chirimoya",
+    "unidad": "Unidad",
+    "stockCompleto": 3,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Papelería",
+    "producto": "Hoja bond colores",
+    "unidad": "Unidad",
+    "stockCompleto": 139,
+    "stockIncompleto": 0,
+    "stockMinimo": 20
+  },
+  {
+    "categoria": "Papelería",
+    "producto": "Cartas navideñas",
+    "unidad": "Unidad",
+    "stockCompleto": 28,
+    "stockIncompleto": 0,
+    "stockMinimo": 5
+  },
+  {
+    "categoria": "Etiquetado",
+    "producto": "Cinta cera azul 300m",
+    "unidad": "Unidad",
+    "stockCompleto": 4,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Etiquetado",
+    "producto": "Cinta cera azul 450m",
+    "unidad": "Unidad",
+    "stockCompleto": 2,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Etiquetado",
+    "producto": "Rollo papel código",
+    "unidad": "Unidad",
+    "stockCompleto": 4,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Exhibidor de productos",
+    "unidad": "unidad",
+    "stockCompleto": 2,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsa 6x19",
+    "unidad": "Paquete",
+    "stockCompleto": 1,
+    "stockIncompleto": 1,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsa 21x24",
+    "unidad": "Paquete",
+    "stockCompleto": 5,
+    "stockIncompleto": 1,
+    "stockMinimo": 2
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsa 12x16",
+    "unidad": "Paquete",
+    "stockCompleto": 1,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsa 12x18",
+    "unidad": "Paquete",
+    "stockCompleto": 0,
+    "stockIncompleto": 1,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsa 12x19",
+    "unidad": "Paquete",
+    "stockCompleto": 2,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsa 20x40",
+    "unidad": "Paquete",
+    "stockCompleto": 0,
+    "stockIncompleto": 1,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsa rollo camiseta",
+    "unidad": "Paquete",
+    "stockCompleto": 3,
+    "stockIncompleto": 1,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsa 8x12 enrollado",
+    "unidad": "Paquete",
+    "stockCompleto": 2,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsa basura",
+    "unidad": "Paquete",
+    "stockCompleto": 10,
+    "stockIncompleto": 0,
+    "stockMinimo": 2
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsa polipropileno brillo",
+    "unidad": "Paquete",
+    "stockCompleto": 9,
+    "stockIncompleto": 3,
+    "stockMinimo": 2
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsa polipropileno plastion",
+    "unidad": "Paquete",
+    "stockCompleto": 4,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsa polipropileno 1 1/2x8x2",
+    "unidad": "Paquete",
+    "stockCompleto": 5,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsa polipropileno 1 1/4x8x2",
+    "unidad": "Paquete",
+    "stockCompleto": 1,
+    "stockIncompleto": 2,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsas Ejoy grandes",
+    "unidad": "Paquete",
+    "stockCompleto": 9,
+    "stockIncompleto": 0,
+    "stockMinimo": 2
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsas Ejoy pequeñas",
+    "unidad": "Paquete",
+    "stockCompleto": 7,
+    "stockIncompleto": 0,
+    "stockMinimo": 2
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsas Chirimoya",
+    "unidad": "Unidad",
+    "stockCompleto": 55,
+    "stockIncompleto": 0,
+    "stockMinimo": 10
+  },
+  {
+    "categoria": "Empaque",
+    "producto": "Bolsas moradas",
+    "unidad": "Unidad",
+    "stockCompleto": 10,
+    "stockIncompleto": 0,
+    "stockMinimo": 5
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Lapiceros",
+    "unidad": "Paquete",
+    "stockCompleto": 1,
+    "stockIncompleto": 2,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Resaltadores",
+    "unidad": "Unidad",
+    "stockCompleto": 7,
+    "stockIncompleto": 0,
+    "stockMinimo": 2
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Cinta masking",
+    "unidad": "unidad",
+    "stockCompleto": 2,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Destop ( porta celular)",
+    "unidad": "unidad",
+    "stockCompleto": 4,
+    "stockIncompleto": 0,
+    "stockMinimo": 2
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Lápiz",
+    "unidad": "Unidad",
+    "stockCompleto": 1,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Marcadores",
+    "unidad": "Unidad",
+    "stockCompleto": 7,
+    "stockIncompleto": 0,
+    "stockMinimo": 2
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Borradores",
+    "unidad": "Unidad",
+    "stockCompleto": 3,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Cinta masking",
+    "unidad": "Unidad",
+    "stockCompleto": 2,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Dispensador cinta",
+    "unidad": "Unidad",
+    "stockCompleto": 3,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Engrapadora",
+    "unidad": "Unidad",
+    "stockCompleto": 4,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Perforador",
+    "unidad": "Unidad",
+    "stockCompleto": 4,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Grapas",
+    "unidad": "Paquete",
+    "stockCompleto": 3,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Chinches ARTI",
+    "unidad": "Paquete",
+    "stockCompleto": 3,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Chinches ARTESCO",
+    "unidad": "Paquete",
+    "stockCompleto": 2,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Accesorios folder",
+    "unidad": "Unidad",
+    "stockCompleto": 12,
+    "stockIncompleto": 0,
+    "stockMinimo": 2
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Plumones delgados",
+    "unidad": "Unidad",
+    "stockCompleto": 5,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Plumones gruesos",
+    "unidad": "Unidad",
+    "stockCompleto": 2,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Correctores",
+    "unidad": "Unidad",
+    "stockCompleto": 5,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Oficina",
+    "producto": "Limpiatipo",
+    "unidad": "Unidad",
+    "stockCompleto": 7,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Limpieza",
+    "producto": "Detergentes",
+    "unidad": "Unidad",
+    "stockCompleto": 4,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Limpieza",
+    "producto": "Guantes",
+    "unidad": "Unidad",
+    "stockCompleto": 3,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Limpieza",
+    "producto": "Limpia vidrios",
+    "unidad": "Unidad",
+    "stockCompleto": 1,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Limpieza",
+    "producto": "Trapos amarillos",
+    "unidad": "Unidad",
+    "stockCompleto": 8,
+    "stockIncompleto": 0,
+    "stockMinimo": 2
+  },
+  {
+    "categoria": "Limpieza",
+    "producto": "Esponjas",
+    "unidad": "Unidad",
+    "stockCompleto": 1,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Equipos",
+    "producto": "Router",
+    "unidad": "Unidad",
+    "stockCompleto": 1,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Equipos",
+    "producto": "Solar Showrase",
+    "unidad": "Unidad",
+    "stockCompleto": 2,
+    "stockIncompleto": 0,
+    "stockMinimo": 0
+  },
+  {
+    "categoria": "Equipos",
+    "producto": "Mouse",
+    "unidad": "Unidad",
+    "stockCompleto": 1,
+    "stockIncompleto": 0,
+    "stockMinimo": 0
+  },
+  {
+    "categoria": "Equipos",
+    "producto": "Cables USB",
+    "unidad": "Unidad",
+    "stockCompleto": 2,
+    "stockIncompleto": 0,
+    "stockMinimo": 0
+  },
+  {
+    "categoria": "Equipos",
+    "producto": "Miccell (cable para audífonos)",
+    "unidad": "Unidad",
+    "stockCompleto": 1,
+    "stockIncompleto": 0,
+    "stockMinimo": 0
+  },
+  {
+    "categoria": "Equipos",
+    "producto": "Ventilador",
+    "unidad": "Unidad",
+    "stockCompleto": 1,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Equipos",
+    "producto": "Parlante grande",
+    "unidad": "Unidad",
+    "stockCompleto": 1,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Equipos",
+    "producto": "Parlante pequeño",
+    "unidad": "Unidad",
+    "stockCompleto": 1,
+    "stockIncompleto": 0,
+    "stockMinimo": 1
+  },
+  {
+    "categoria": "Bonificaicones",
+    "producto": "Bolsas Chirimoya",
+    "unidad": "Unidad",
+    "stockCompleto": 55,
+    "stockIncompleto": 0,
+    "stockMinimo": 0
+  },
+  {
+    "categoria": "Bonificaicones",
+    "producto": "Bolsas Moradas",
+    "unidad": "Unidad",
+    "stockCompleto": 10,
+    "stockIncompleto": 0,
+    "stockMinimo": 0
+  },
+  {
+    "categoria": "Bonificaicones",
+    "producto": "Polos Bonificación",
+    "unidad": "Unidad",
+    "stockCompleto": 21,
+    "stockIncompleto": 0,
+    "stockMinimo": 0
+  },
+  {
+    "categoria": "Bonificaicones",
+    "producto": "Regalos de Proveedores (Polos)",
+    "unidad": "Unidad",
+    "stockCompleto": 21,
+    "stockIncompleto": 0,
+    "stockMinimo": 0
+  },
+  {
+    "categoria": "Bonificaicones",
+    "producto": "Regalos de Proveedores (Llaveros)",
+    "unidad": "Unidad",
+    "stockCompleto": 9,
+    "stockIncompleto": 0,
+    "stockMinimo": 0
+  },
+  {
+    "categoria": "Bonificaicones",
+    "producto": "Bolsos Argani",
+    "unidad": "Unidad",
+    "stockCompleto": 71,
+    "stockIncompleto": 0,
+    "stockMinimo": 0
+  },
+  {
+    "categoria": "Bonificaicones",
+    "producto": "Tomatodo Azul",
+    "unidad": "Unidad",
+    "stockCompleto": 1,
+    "stockIncompleto": 0,
+    "stockMinimo": 0
+  }
+]

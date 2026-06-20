@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Producto {
+  id              Int          @id @default(autoincrement())
+  categoria       String
+  producto        String
+  unidad          String       @default("Unidad")
+  stockCompleto   Int          @default(0)
+  stockIncompleto Int          @default(0)
+  stockMinimo     Int          @default(0)
+  unidadesPorPaquete Int       @default(1) // cuántas unidades trae un paquete (para solicitudes por paquete)
+  solicitable     Boolean      @default(false)
+  movimientos     Movimiento[]
+  ticketItems     TicketItem[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([categoria])
+}
+
+model Movimiento {
+  id          Int      @id @default(autoincrement())
+  productoId  Int
+  producto    Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
+  tipo        String // ENTRADA | SALIDA
+  cantidad    Int
+  destino     String? // tienda o área a la que se entregó (salida)
+  responsable String?
+  observacion String?
+  fecha       DateTime @default(now())
+
+  @@index([productoId])
+  @@index([fecha])
+}
+
+model Usuario {
+  id                 Int         @id @default(autoincrement())
+  username           String      @unique
+  nombre             String
+  passwordHash       String
+  rol                String      @default("usuario") // admin | usuario | tienda | lider
+  tienda             String? // nombre de la tienda (para usuarios rol "tienda")
+  area               String? // área (para usuarios rol "lider": RR.HH | Marketing | Logística)
+  activo             Boolean     @default(true)
+  ultimoLogin        DateTime?
+  ultimaIp           String?
+  createdAt          DateTime    @default(now())
+  actividades        Actividad[]
+  ticketsSolicitados Ticket[]    @relation("ticketSolicitante")
+  ticketsAtendidos   Ticket[]    @relation("ticketAtendido")
+}
+
+model Actividad {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  accion    String
+  detalle   String?
+  ip        String?
+  fecha     DateTime @default(now())
+
+  @@index([usuarioId])
+  @@index([fecha])
+}
+
+model Ticket {
+  id              Int          @id @default(autoincrement())
+  area            String? // área o motivo de la solicitud (texto libre)
+  nota            String?
+  estado          String       @default("PENDIENTE") // PENDIENTE | APROBADO | ENTREGADO | RECHAZADO
+  solicitanteId   Int
+  solicitante     Usuario      @relation("ticketSolicitante", fields: [solicitanteId], references: [id], onDelete: Cascade)
+  atendidoPorId   Int?
+  atendidoPor     Usuario?     @relation("ticketAtendido", fields: [atendidoPorId], references: [id])
+  motivoRechazo   String?
+  observacionAdmin String? // criterio / nota del admin al aprobar o entregar (ej. por qué ajustó cantidades)
+  items           TicketItem[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([solicitanteId])
+  @@index([estado])
+  @@index([createdAt])
+}
+
+model TicketItem {
+  id               Int      @id @default(autoincrement())
+  ticketId         Int
+  ticket           Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  productoId       Int
+  producto         Producto @relation(fields: [productoId], references: [id])
+  cantidad         Int // cantidad solicitada por la tienda/área (en unidades o paquetes según enPaquetes)
+  cantidadAprobada Int? // cantidad ajustada por el admin (si es null, se usa la solicitada)
+  enPaquetes       Boolean  @default(false) // si true, cantidad/cantidadAprobada están en paquetes
+
+  @@index([ticketId])
+  @@index([productoId])
+}
