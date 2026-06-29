@@ -1,20 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { TIENDAS as CATALOGO } from '../src/data/tiendas.js';
 
 const prisma = new PrismaClient();
 
-// username, nombre de la tienda. Contraseña inicial común (cámbiala luego).
+// Contraseña inicial común; cada tienda debería cambiarla al ingresar.
 const PASS_INICIAL = 'tienda123';
-const TIENDAS = [
-  { username: 'cosmeticos', tienda: 'Cosmeticos' },
-  { username: 'deluxe', tienda: 'Deluxe Import' },
-  { username: 'coralnails', tienda: 'Coral Nails' },
-  { username: 'missbeauty', tienda: 'Miss Beauty' },
-  { username: 'coralbarber', tienda: 'Coral Barber' },
-  { username: 'capitanbarber', tienda: 'Capitan Barber' },
-  { username: 'coralstore', tienda: 'Coral Store' },
-  { username: 'nova', tienda: 'Nova' },
-];
+
+// Catálogo importado de src/data/tiendas.js (única fuente de verdad).
+const TIENDAS = CATALOGO.map(({ username, nombre }) => ({ username, tienda: nombre }));
 
 async function main() {
   // Limpia el usuario de ejemplo si quedó

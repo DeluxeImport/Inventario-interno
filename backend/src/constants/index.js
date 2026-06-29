@@ -29,3 +29,14 @@ export const STOCK_ESTADOS = {
   BAJO: 'BAJO',
   AGOTADO: 'AGOTADO',
 };
+
+// Secciones del login. Cada rol pertenece a UNA sola sección y el backend
+// se niega a emitir token si el cliente eligió la sección equivocada.
+export const SECCIONES = {
+  ADMIN: 'admin',
+  TIENDA: 'tienda',
+};
+export const SECCIONES_LIST = Object.values(SECCIONES);
+
+export const seccionDeRol = (rol) =>
+  REQUESTER_ROLES.includes(rol) ? SECCIONES.TIENDA : SECCIONES.ADMIN;

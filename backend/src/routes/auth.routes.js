@@ -1,13 +1,16 @@
 import { Router } from 'express';
 import { asyncHandler } from '../lib/asyncHandler.js';
 import { auth } from '../middleware/auth.js';
+import { validate } from '../middleware/validate.js';
 import { getIp, publicUser } from '../utils/index.js';
+import { loginSchema } from '../validators/schemas.js';
 import * as authService from '../services/auth.service.js';
 
 const router = Router();
 
 router.post(
   '/login',
+  validate(loginSchema),
   asyncHandler(async (req, res) => {
     const result = await authService.login({ ...req.body, ip: getIp(req) });
     res.json(result);

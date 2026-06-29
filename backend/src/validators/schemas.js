@@ -1,5 +1,12 @@
 import { z } from 'zod';
-import { MOV_TIPOS, ROLES_LIST } from '../constants/index.js';
+import { MOV_TIPOS, ROLES_LIST, SECCIONES_LIST } from '../constants/index.js';
+
+// ----- Auth -----
+export const loginSchema = z.object({
+  username: z.string().trim().min(1, 'Usuario y contraseña son obligatorios.'),
+  password: z.string().min(1, 'Usuario y contraseña son obligatorios.'),
+  seccion: z.enum(SECCIONES_LIST, 'Sección inválida.'),
+});
 
 const OBLIGATORIO_PRODUCTO = 'Categoría y producto son obligatorios.';
 const OBLIGATORIO_USUARIO = 'Usuario, nombre y contraseña son obligatorios.';
@@ -86,6 +93,12 @@ export const ticketEstadoSchema = z.object({
   accion: z.enum(['aprobar', 'rechazar', 'entregar'], 'Acción inválida.'),
   observacion: z.string().optional(),
   items: z
-    .array(z.object({ id: z.coerce.number().int(), cantidad: z.coerce.number().int() }))
+    .array(
+      z.object({
+        id: z.coerce.number().int(),
+        // 0 es válido: significa "rechazar este ítem dentro del ticket".
+        cantidad: z.coerce.number().int().min(0, 'La cantidad no puede ser negativa.'),
+      })
+    )
     .optional(),
 });

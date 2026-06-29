@@ -47,17 +47,25 @@ export async function crear(user, { area, nota, items }) {
 }
 
 // Aplica los ajustes de cantidad del admin (cantidadAprobada) a los ítems del ticket.
+// Semántica:
+//   cantidadAprobada > 0  → se entregará esa cantidad
+//   cantidadAprobada = 0  → ítem RECHAZADO dentro del ticket (no descuenta stock,
+//                            no se genera Movimiento al entregar)
 async function aplicarAjustes(tx, ticket, items) {
   if (!Array.isArray(items)) return;
   for (const aj of items) {
     const item = ticket.items.find((t) => t.id === Number(aj.id));
     if (!item) continue;
     const cant = Number(aj.cantidad);
-    if (!Number.isInteger(cant) || cant < 1)
-      throw badRequest('Las cantidades aprobadas deben ser números enteros mayores o iguales a 1.');
+    if (!Number.isInteger(cant) || cant < 0)
+      throw badRequest('Las cantidades aprobadas deben ser números enteros (0 = rechazar ítem).');
     await tx.ticketItem.update({ where: { id: item.id }, data: { cantidadAprobada: cant } });
   }
 }
+
+// Calcula la cantidad efectiva a entregar de un ítem (ajuste del admin o
+// cantidad solicitada por defecto). `0` indica ítem rechazado.
+const cantidadEfectiva = (it) => it.cantidadAprobada ?? it.cantidad;
 
 // Procesa el ticket (solo admin desde la ruta): aprobar | rechazar | entregar.
 // `items` permite ajustar las cantidades aprobadas; `observacion` es el criterio del admin.
@@ -122,15 +130,22 @@ export async function cambiarEstado(actor, id, { accion, observacion, items }) {
         where: { ticketId: id },
         include: { producto: true },
       });
-      for (const it of finales) {
-        const efectiva = it.cantidadAprobada ?? it.cantidad;
+      // Ítems con cantidad efectiva 0 = rechazados → se ignoran al entregar.
+      // Solo los que tienen cantidad > 0 mueven stock y generan Movimiento.
+      const aEntregar = finales.filter((it) => cantidadEfectiva(it) > 0);
+      if (aEntregar.length === 0)
+        throw badRequest(
+          'Todos los ítems quedaron rechazados. Usa "Rechazar" para rechazar el ticket completo.'
+        );
+      for (const it of aEntregar) {
+        const efectiva = cantidadEfectiva(it);
         if (it.producto.stockCompleto < efectiva)
           throw badRequest(
             `Stock insuficiente de "${it.producto.producto}". Disponible: ${it.producto.stockCompleto}, a entregar: ${efectiva}.`
           );
       }
-      for (const it of finales) {
-        const efectiva = it.cantidadAprobada ?? it.cantidad;
+      for (const it of aEntregar) {
+        const efectiva = cantidadEfectiva(it);
         // Descuento atómico: solo descuenta si TODAVÍA hay stock suficiente en este instante.
         // El guard `stockCompleto >= efectiva` cierra la condición de carrera entre entregas
         // concurrentes (dos admins entregando el mismo producto a la vez no pueden sobregirar).

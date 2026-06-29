@@ -160,6 +160,9 @@ function NuevoTicketModal({ onClose, onSaved, onError }) {
 }
 
 // ---------- Modal: procesar (admin ajusta cantidades + observación) ----------
+// Convención: cantidad=0 en un ítem = "rechazar ese ítem" (no se descuenta
+// stock ni se genera movimiento). El backend valida que al menos uno
+// quede > 0; si todos son 0 hay que usar el botón Rechazar.
 function ProcesarTicketModal({ ticket, onClose, onDone, onError }) {
   const [items, setItems] = useState(
     ticket.items.map((it) => ({
@@ -174,10 +177,18 @@ function ProcesarTicketModal({ ticket, onClose, onDone, onError }) {
   const [busy, setBusy] = useState(false);
   const setCant = (id, v) =>
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, cantidad: v } : i)));
+  const rechazarItem = (id) => setCant(id, 0);
+  const restaurarItem = (id, solicitada) => setCant(id, solicitada);
+
+  const todosRechazados = items.every((i) => Number(i.cantidad) === 0);
 
   const ejecutar = async (accion) => {
     if (accion === 'rechazar' && !obs.trim()) {
       onError('Coloca una observación para rechazar la solicitud.');
+      return;
+    }
+    if (accion === 'entregar' && todosRechazados) {
+      onError('Todos los ítems están rechazados. Usa "Rechazar" para rechazar el ticket completo.');
       return;
     }
     if (
@@ -209,25 +220,52 @@ function ProcesarTicketModal({ ticket, onClose, onDone, onError }) {
         </div>
         <div className="form">
           <p className="muted">
-            Revisa y ajusta la cantidad a entregar de cada producto según tu criterio.
+            Ajusta la cantidad a entregar. Usa <strong>0</strong> o el botón ⊘ para rechazar un ítem
+            sin descontar stock.
           </p>
           <div className="proc-items">
-            {items.map((i) => (
-              <div key={i.id} className="proc-row">
-                <span className="proc-name">{i.producto}</span>
-                <span className="proc-sol">
-                  pidió {i.solicitada} {i.unidad}
-                </span>
-                <input
-                  type="number"
-                  min="1"
-                  value={i.cantidad}
-                  onChange={(e) => setCant(i.id, e.target.value)}
-                  className="cant-input"
-                />
-                <span className="proc-uni">{i.unidad}</span>
-              </div>
-            ))}
+            {items.map((i) => {
+              const rechazado = Number(i.cantidad) === 0;
+              return (
+                <div key={i.id} className={'proc-row' + (rechazado ? ' proc-row--rechazado' : '')}>
+                  <span className="proc-name">{i.producto}</span>
+                  <span className="proc-sol">
+                    pidió {i.solicitada} {i.unidad}
+                  </span>
+                  {rechazado ? (
+                    <span className="proc-rechazado">Rechazado</span>
+                  ) : (
+                    <input
+                      type="number"
+                      min="0"
+                      value={i.cantidad}
+                      onChange={(e) => setCant(i.id, e.target.value)}
+                      className="cant-input"
+                    />
+                  )}
+                  <span className="proc-uni">{i.unidad}</span>
+                  {rechazado ? (
+                    <button
+                      type="button"
+                      className="btn btn-sm"
+                      onClick={() => restaurarItem(i.id, i.solicitada)}
+                      title="Restaurar este ítem"
+                    >
+                      Restaurar
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-danger"
+                      onClick={() => rechazarItem(i.id)}
+                      title="Rechazar solo este ítem"
+                    >
+                      ⊘
+                    </button>
+                  )}
+                </div>
+              );
+            })}
           </div>
           <label>
             Observación / criterio
@@ -235,7 +273,7 @@ function ProcesarTicketModal({ ticket, onClose, onDone, onError }) {
               rows="3"
               value={obs}
               onChange={(e) => setObs(e.target.value)}
-              placeholder="Ej. Se aprueba 1 porque el stock es limitado y cubre la necesidad real."
+              placeholder="Ej. Se rechazan las bolsas pequeñas porque no hay stock disponible."
             />
           </label>
           <div className="modal-foot proc-foot">
@@ -246,7 +284,11 @@ function ProcesarTicketModal({ ticket, onClose, onDone, onError }) {
             <button className="btn" disabled={busy} onClick={() => ejecutar('aprobar')}>
               Aprobar
             </button>
-            <button className="btn btn-ok" disabled={busy} onClick={() => ejecutar('entregar')}>
+            <button
+              className="btn btn-ok"
+              disabled={busy || todosRechazados}
+              onClick={() => ejecutar('entregar')}
+            >
               Entregar
             </button>
           </div>
@@ -280,11 +322,20 @@ function TicketCard({ ticket, esAdmin, onProcesar }) {
       </div>
       <ul className="ticket-items">
         {ticket.items.map((it) => {
-          const ajustada = it.cantidadAprobada != null && it.cantidadAprobada !== it.cantidad;
+          const rechazado = it.cantidadAprobada === 0;
+          const ajustada =
+            !rechazado && it.cantidadAprobada != null && it.cantidadAprobada !== it.cantidad;
           return (
-            <li key={it.id}>
+            <li key={it.id} className={rechazado ? 'ticket-item--rechazado' : undefined}>
               <span>{it.producto?.producto}</span>
-              {ajustada ? (
+              {rechazado ? (
+                <strong className="qty-rech">
+                  <s>
+                    {it.cantidad} {it.producto?.unidad}
+                  </s>{' '}
+                  <span className="badge badge-agotado">Rechazado</span>
+                </strong>
+              ) : ajustada ? (
                 <strong className="qty-adj">
                   <s>{it.cantidad}</s> → {it.cantidadAprobada} {it.producto?.unidad}
                 </strong>

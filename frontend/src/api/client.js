@@ -40,9 +40,13 @@ async function req(path, opts = {}) {
 
 export const api = {
   // Auth
-  login: (username, password) =>
-    req('/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) }),
+  login: (username, password, seccion) =>
+    req('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password, seccion }),
+    }),
   me: () => req('/auth/me'),
+  tiendasPublicas: () => req('/tiendas/publicas'),
   cambiarPassword: (actual, nueva) =>
     req('/auth/cambiar-password', { method: 'POST', body: JSON.stringify({ actual, nueva }) }),
 
