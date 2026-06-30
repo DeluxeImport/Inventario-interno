@@ -18,6 +18,12 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    # Env mínimo que exige `config/env.js` al ser importado por los tests.
+    # Valores dummy: ningún test unitario abre conexión a Postgres ni firma JWTs reales.
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      JWT_SECRET: ci-jwt-secret-not-used-for-real-signing-just-to-pass-config-validation
+      NODE_ENV: development
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
