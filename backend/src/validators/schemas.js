@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { MOV_TIPOS, ROLES_LIST, SECCIONES_LIST } from '../constants/index.js';
+import { PASSWORD_MIN_LENGTH, PASSWORD_POLICY_MESSAGE } from '../security/passwordPolicy.js';
 
 // ----- Auth -----
 export const loginSchema = z.object({
@@ -21,6 +22,8 @@ const stockNoNegativo = z.coerce
 const rolValido = z
   .string()
   .refine((r) => ROLES_LIST.includes(r), 'Rol inválido.');
+
+const passwordSeguro = z.string().min(PASSWORD_MIN_LENGTH, PASSWORD_POLICY_MESSAGE);
 
 // ----- Productos -----
 export const productoCrearSchema = z.object({
@@ -57,7 +60,7 @@ export const movimientoSchema = z.object({
 export const usuarioCrearSchema = z.object({
   username: z.string().trim().min(1, OBLIGATORIO_USUARIO),
   nombre: z.string().trim().min(1, OBLIGATORIO_USUARIO),
-  password: z.string().min(4, 'La contraseña debe tener al menos 4 caracteres.'),
+  password: passwordSeguro,
   rol: rolValido.optional(),
   tienda: z.string().optional(),
   area: z.string().optional(),
@@ -69,7 +72,7 @@ export const usuarioEditarSchema = z.object({
   tienda: z.string().optional(),
   area: z.string().optional(),
   activo: z.boolean().optional(),
-  password: z.string().optional(),
+  password: passwordSeguro.optional(),
 });
 
 // ----- Tickets -----

@@ -3,6 +3,7 @@ import { prisma } from '../lib/prisma.js';
 import { publicUser } from '../utils/index.js';
 import { badRequest, notFound } from '../lib/AppError.js';
 import { ROLES, ROLES_LIST, AREAS } from '../constants/index.js';
+import { assertPasswordAllowed } from '../security/passwordPolicy.js';
 
 const normRol = (r) => (ROLES_LIST.includes(r) ? r : ROLES.USUARIO);
 
@@ -40,6 +41,7 @@ export async function crear(data) {
   const tienda = data.tienda?.trim() || null;
   const area = data.area?.trim() || null;
   validarDestino(rol, tienda, area);
+  assertPasswordAllowed(data.password);
 
   const passwordHash = await bcrypt.hash(data.password, 10);
   const nuevo = await prisma.usuario.create({
@@ -66,8 +68,7 @@ export async function actualizar(id, data) {
   if (data.area != null) patch.area = data.area.trim() || null;
   if (data.activo != null) patch.activo = !!data.activo;
   if (data.password) {
-    if (data.password.length < 4)
-      throw badRequest('La contraseña debe tener al menos 4 caracteres.');
+    assertPasswordAllowed(data.password);
     patch.passwordHash = await bcrypt.hash(data.password, 10);
   }
 

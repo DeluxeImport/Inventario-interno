@@ -5,6 +5,7 @@ import { config } from '../config/env.js';
 import { publicUser } from '../utils/index.js';
 import { unauthorized, badRequest } from '../lib/AppError.js';
 import { SECCIONES, seccionDeRol } from '../constants/index.js';
+import { assertPasswordAllowed } from '../security/passwordPolicy.js';
 import * as actividad from './actividad.service.js';
 
 const ERROR_CRUCE_SECCION = {
@@ -40,8 +41,7 @@ export async function login({ username, password, seccion, ip }) {
 export async function cambiarPassword(user, { actual, nueva }, ip) {
   const ok = await bcrypt.compare(actual || '', user.passwordHash);
   if (!ok) throw badRequest('La contraseña actual no es correcta.');
-  if (!nueva || nueva.length < 4)
-    throw badRequest('La nueva contraseña debe tener al menos 4 caracteres.');
+  assertPasswordAllowed(nueva);
 
   const passwordHash = await bcrypt.hash(nueva, 10);
   await prisma.usuario.update({ where: { id: user.id }, data: { passwordHash } });

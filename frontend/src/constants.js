@@ -21,7 +21,7 @@ export const PERMISOS = {
   lider: ['tickets'],
 };
 
-export const puede = (rol, modulo) => (PERMISOS[rol] || PERMISOS.usuario).includes(modulo);
+export const puede = (rol, modulo) => (PERMISOS[rol] || []).includes(modulo);
 
 export const TABS = [
   ['inventario', 'Inventario'],
@@ -35,7 +35,8 @@ export const rolLabel = (user) => {
   if (user.rol === ROLES.ADMIN) return 'Administrador';
   if (user.rol === ROLES.TIENDA) return `Tienda${user.tienda ? ' · ' + user.tienda : ''}`;
   if (user.rol === ROLES.LIDER) return `Área${user.area ? ' · ' + user.area : ''}`;
-  return 'Usuario';
+  if (user.rol === ROLES.USUARIO) return 'Usuario';
+  return 'Rol no permitido';
 };
 
 // Nombre legible del origen/destino de un usuario solicitante (tienda o área).

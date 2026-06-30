@@ -9,6 +9,8 @@ import {
   clampLimit,
 } from '../src/utils/index.js';
 import { ROLES_LIST, STOCK_ESTADOS } from '../src/constants/index.js';
+import { buildConfig } from '../src/config/buildConfig.js';
+import { soloAlmacen } from '../src/middleware/auth.js';
 import {
   productoCrearSchema,
   usuarioCrearSchema,
@@ -115,18 +117,29 @@ test('usuarioCrearSchema: rechaza un rol inválido', () => {
   const r = usuarioCrearSchema.safeParse({
     username: 'x',
     nombre: 'X',
-    password: '1234',
+    password: 'clave123',
     rol: 'superadmin',
   });
   assert.equal(r.success, false);
   assert.match(r.error.issues[0].message, /Rol inválido/);
 });
 
-test('usuarioCrearSchema: acepta un rol válido de la lista', () => {
+test('usuarioCrearSchema: rechaza contraseñas menores a 8 caracteres', () => {
   const r = usuarioCrearSchema.safeParse({
     username: 'x',
     nombre: 'X',
     password: '1234',
+    rol: 'usuario',
+  });
+  assert.equal(r.success, false);
+  assert.match(r.error.issues[0].message, /8 caracteres/);
+});
+
+test('usuarioCrearSchema: acepta un rol válido y una contraseña fuerte mínima', () => {
+  const r = usuarioCrearSchema.safeParse({
+    username: 'x',
+    nombre: 'X',
+    password: 'clave123',
     rol: 'tienda',
   });
   assert.equal(r.success, true);
@@ -142,4 +155,51 @@ test('ticketCrearSchema: rechaza cantidad decimal o no positiva', () => {
 test('ticketCrearSchema: acepta cantidades enteras positivas', () => {
   const r = ticketCrearSchema.safeParse({ items: [{ productoId: 1, cantidad: 3 }] });
   assert.equal(r.success, true);
+});
+
+test('buildConfig: en producción exige CORS_ORIGIN explícito', () => {
+  assert.throws(
+    () =>
+      buildConfig({
+        DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
+        NODE_ENV: 'production',
+        JWT_SECRET: 'a'.repeat(32),
+      }),
+    /CORS_ORIGIN/
+  );
+});
+
+test('buildConfig: en desarrollo permite cualquier origen si CORS_ORIGIN está vacío', () => {
+  const cfg = buildConfig({
+    DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
+    NODE_ENV: 'development',
+    JWT_SECRET: 'a'.repeat(32),
+    CORS_ORIGIN: '',
+  });
+  assert.equal(cfg.corsOrigin, true);
+});
+
+test('buildConfig: normaliza lista de CORS_ORIGIN cuando está configurado', () => {
+  const cfg = buildConfig({
+    DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
+    NODE_ENV: 'production',
+    JWT_SECRET: 'a'.repeat(32),
+    CORS_ORIGIN: 'https://a.com, https://b.com ',
+  });
+  assert.deepEqual(cfg.corsOrigin, ['https://a.com', 'https://b.com']);
+});
+
+test('soloAlmacen: rechaza roles desconocidos en vez de heredarlos como almacén', () => {
+  assert.throws(
+    () => soloAlmacen({ user: { rol: 'superadmin' } }, {}, () => {}),
+    /permiso/
+  );
+});
+
+test('soloAlmacen: permite roles explícitos de almacén', () => {
+  let called = false;
+  soloAlmacen({ user: { rol: 'usuario' } }, {}, () => {
+    called = true;
+  });
+  assert.equal(called, true);
 });

@@ -7,7 +7,7 @@ Datos precargados desde el Excel original (70 productos en 7 categorías).
 
 - **Frontend:** React + Vite
 - **Backend:** Node.js + Express
-- **Base de datos:** SQLite (vía Prisma ORM)
+- **Base de datos:** PostgreSQL (vía Prisma ORM)
 
 ## Funciones
 
@@ -48,7 +48,7 @@ Al instalar se crea un usuario administrador:
 
 > **Solo las tiendas crean solicitudes (tickets).** El administrador **no** puede crear solicitudes: únicamente las procesa (Aprobar → Entregar) o las Rechaza con una observación obligatoria.
 
-> **Importante:** cambia las contraseñas después del primer ingreso. Desde *Administración → Usuarios → Editar* puedes cambiar la contraseña y crear más usuarios.
+> **Importante:** cambia las contraseñas después del primer ingreso. Desde *Administración → Usuarios → Editar* puedes cambiar la contraseña y crear más usuarios. Las contraseñas nuevas deben tener al menos 8 caracteres.
 > El secreto de las sesiones está en `backend/.env` (`JWT_SECRET`) — conviene reemplazarlo por uno propio largo y aleatorio.
 
 ## Cómo usarlo (Windows)
@@ -115,12 +115,12 @@ src/
 ## Desarrollo
 
 - **Variables de entorno:** copia `backend/.env.example` a `backend/.env`. `JWT_SECRET` es obligatorio (mínimo 16 caracteres); genera uno con
-  `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`. Si falta o es inválido, el servidor no arranca y avisa qué falta.
-- **Tests:** `cd backend && npm test` (usa el runner nativo de Node, sin dependencias extra).
-- **Validación:** todas las entradas de la API se validan con **zod**; las contraseñas se guardan con **bcrypt** y las sesiones usan **JWT**.
+  `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`. Si falta o es inválido, el servidor no arranca y avisa qué falta. En `NODE_ENV=production`, `CORS_ORIGIN` también es obligatorio y debe apuntar al dominio real.
+- **Tests:** `cd backend && npm test` y `cd frontend && npm test` (usan el runner nativo de Node, sin dependencias extra).
+- **Validación:** todas las entradas de la API se validan con **zod**; las contraseñas se guardan con **bcrypt**, requieren mínimo 8 caracteres, y las sesiones usan **JWT**.
 
 ## Notas
 
 - Los movimientos de **entrada/salida** ajustan el campo **Stock completo**. El **Stock incompleto** (paquetes abiertos) se edita manualmente desde el botón *Editar*.
 - El **Stock total** = completo + incompleto. La alerta salta cuando `total ≤ mínimo`.
-- La base de datos vive en `backend/prisma/dev.db`. Para reiniciar todo desde cero, borra ese archivo y vuelve a correr `instalar.bat`.
+- La base de datos esperada por el esquema actual es PostgreSQL. Para reiniciar un entorno local, recrea la base/volumen de PostgreSQL y vuelve a correr `npm run db:setup` desde `backend/`.

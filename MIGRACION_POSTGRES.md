@@ -5,6 +5,9 @@ escrituras concurrentes reales. El código ya está endurecido (descuentos de st
 atómicos, índices, paginación, rate-limit, CORS, helmet); solo falta el corte de base
 de datos, que se hace en una sola sesión cuando tú quieras.
 
+> Estado actual del repositorio: `backend/prisma/schema.prisma` ya usa `postgresql`.
+> Esta guía queda como referencia para entornos antiguos que aún tengan `dev.db`.
+
 > El corte requiere Docker corriendo (o una base PostgreSQL de un proveedor). Por eso no
 > se ejecutó automáticamente: no se toca tu `dev.db` actual hasta que tú decidas migrar.
 
@@ -77,7 +80,7 @@ Para un inventario que se resiembra desde Excel, normalmente la opción 1 no es 
 
 ```bash
 cd backend
-node --test          # 17 pruebas deben pasar
+node --test          # las pruebas del backend deben pasar
 npm run dev          # arranca contra PostgreSQL
 ```
 
@@ -89,7 +92,8 @@ movimientos, solicitudes y bitácora cargan.
 - [ ] **Cambiar las contraseñas por defecto** `admin123` (admin) y `tienda123`/`lider123` (tiendas/líderes) ANTES de exponer a internet.
 - [ ] `NODE_ENV=production` en el `.env` del servidor.
 - [ ] `JWT_SECRET` fuerte y distinto al de desarrollo.
-- [ ] `CORS_ORIGIN` fijado al dominio real del frontend.
+- [ ] `CORS_ORIGIN` fijado al dominio real del frontend; en producción el backend no arranca sin este valor.
+- [ ] Contraseñas nuevas con mínimo 8 caracteres.
 - [ ] Cambiar `POSTGRES_PASSWORD` del docker-compose (o usar la clave del proveedor).
 - [ ] HTTPS por delante (el proveedor de hosting o un proxy como Caddy/Nginx).
 - [ ] Backups automáticos de la base (la mayoría de proveedores lo incluyen).
