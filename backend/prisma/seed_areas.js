@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaCnotlient();
+const prisma = new PrismaClient();
 
 const PASS_INICIAL = 'lider123';
 const LIDERES = [
