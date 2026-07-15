@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../api/client';
 import EstadoBadge from '../common/EstadoBadge';
+import Icon from '../common/Icon';
 import ProductoModal from './ProductoModal';
 import MovimientoModal from './MovimientoModal';
 
@@ -12,6 +13,13 @@ const PRODUCTO_VACIO = {
   stockIncompleto: 0,
   stockMinimo: 0,
   solicitable: false,
+};
+
+// Clase de la fila según la gravedad del estado: agotado pesa más que stock bajo.
+const claseFila = (estado) => {
+  if (estado === 'AGOTADO') return 'row-alert row-alert--critica';
+  if (estado === 'BAJO') return 'row-alert';
+  return '';
 };
 
 export default function Inventario({ categorias, onChanged, onError }) {
@@ -57,25 +65,35 @@ export default function Inventario({ categorias, onChanged, onError }) {
   return (
     <div>
       <div className="toolbar">
-        <input
-          className="search"
-          placeholder="🔍 Buscar producto..."
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
-        <select value={cat} onChange={(e) => setCat(e.target.value)}>
+        <div className="search-field">
+          <Icon name="buscar" size={14} />
+          <input
+            type="search"
+            placeholder="Buscar producto…"
+            aria-label="Buscar producto"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+        </div>
+        <select value={cat} onChange={(e) => setCat(e.target.value)} aria-label="Categoría">
           <option>Todas</option>
           {categorias.map((c) => (
             <option key={c}>{c}</option>
           ))}
         </select>
         <button className="btn btn-primary" onClick={() => setEditing({ ...PRODUCTO_VACIO })}>
-          + Nuevo producto
+          <Icon name="mas" size={13} strokeWidth={2} />
+          Nuevo producto
         </button>
+        {!loading && (
+          <span className="toolbar-count">
+            {productos.length === 1 ? '1 producto' : `${productos.length} productos`}
+          </span>
+        )}
       </div>
 
       {loading ? (
-        <p className="muted">Cargando...</p>
+        <p className="muted">Cargando…</p>
       ) : (
         <div className="table-wrap">
           <table className="tbl-stock">
@@ -89,17 +107,17 @@ export default function Inventario({ categorias, onChanged, onError }) {
                 <th className="num">Total</th>
                 <th className="num">Mínimo</th>
                 <th>Estado</th>
-                <th>Acciones</th>
+                <th className="col-acciones">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {productos.map((p) => (
-                <tr key={p.id} className={p.estado !== 'OK' ? 'row-alert' : ''}>
+                <tr key={p.id} className={claseFila(p.estado)}>
                   <td data-label="Producto" className="strong">
                     {p.producto}
                     {p.solicitable && (
-                      <span className="tag-solic" title="Solicitable por ticket">
-                        🎫
+                      <span className="tag-solic">
+                        <Icon name="ticket" size={13} title="Solicitable por ticket" />
                       </span>
                     )}
                   </td>
@@ -113,22 +131,32 @@ export default function Inventario({ categorias, onChanged, onError }) {
                     <EstadoBadge estado={p.estado} />
                   </td>
                   <td data-label="Acciones" className="actions">
-                    <button className="btn btn-sm btn-mov" onClick={() => setMovFor(p)}>
-                      Mov.
-                    </button>
-                    <button className="btn btn-sm" onClick={() => setEditing(p)}>
-                      Editar
-                    </button>
-                    <button className="btn btn-sm btn-danger" onClick={() => borrar(p)}>
-                      Borrar
-                    </button>
+                    <div className="row-actions">
+                      <button
+                        className="icon-btn"
+                        onClick={() => setMovFor(p)}
+                        title="Registrar movimiento"
+                      >
+                        <Icon name="transfer" size={15} title="Registrar movimiento" />
+                      </button>
+                      <button className="icon-btn" onClick={() => setEditing(p)} title="Editar">
+                        <Icon name="lapiz" size={15} title="Editar" />
+                      </button>
+                      <button
+                        className="icon-btn icon-btn--danger"
+                        onClick={() => borrar(p)}
+                        title="Eliminar producto"
+                      >
+                        <Icon name="basura" size={15} title="Eliminar producto" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
               {productos.length === 0 && (
                 <tr>
                   <td colSpan={9} className="muted center">
-                    Sin resultados.
+                    No hay productos que coincidan con la búsqueda.
                   </td>
                 </tr>
               )}

@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../api/client';
+import { fmtFecha } from '../../lib/format';
+import Icon from '../common/Icon';
 
 // Tamaño de página del backend (debe coincidir con el `limit` por defecto del servicio).
 const PAGE_SIZE = 100;
@@ -68,17 +70,20 @@ export default function Movimientos({ onError, refreshKey, onChanged }) {
             <th>Destino</th>
             <th>Responsable</th>
             <th>Observación</th>
-            <th>Acciones</th>
+            <th className="col-acciones">Acciones</th>
           </tr>
         </thead>
         <tbody>
           {movs.map((m) => (
             <tr key={m.id}>
               <td data-label="Producto" className="strong">{m.producto?.producto}</td>
-              <td data-label="Fecha">{new Date(m.fecha).toLocaleString('es-PE')}</td>
+              <td data-label="Fecha">{fmtFecha(m.fecha)}</td>
               <td data-label="Tipo">
-                <span className={`badge badge-${m.tipo === 'ENTRADA' ? 'ok' : 'mov'}`}>
-                  {m.tipo === 'ENTRADA' ? '↓ Entrada' : '↑ Salida'}
+                <span
+                  className={`badge badge--icono badge-${m.tipo === 'ENTRADA' ? 'ok' : 'mov'}`}
+                >
+                  <Icon name={m.tipo === 'ENTRADA' ? 'entrada' : 'salida'} size={12} />
+                  {m.tipo === 'ENTRADA' ? 'Entrada' : 'Salida'}
                 </span>
               </td>
               <td data-label="Cantidad" className="num strong">{m.cantidad}</td>
@@ -87,9 +92,15 @@ export default function Movimientos({ onError, refreshKey, onChanged }) {
               <td data-label="Responsable">{m.responsable || '—'}</td>
               <td data-label="Observación">{m.observacion || '—'}</td>
               <td data-label="Acciones" className="actions">
-                <button className="btn btn-sm btn-danger" onClick={() => borrar(m)}>
-                  Eliminar
-                </button>
+                <div className="row-actions">
+                  <button
+                    className="icon-btn icon-btn--danger"
+                    onClick={() => borrar(m)}
+                    title="Eliminar movimiento"
+                  >
+                    <Icon name="basura" size={15} title="Eliminar movimiento" />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

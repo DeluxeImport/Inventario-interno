@@ -1,7 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../api/client';
 import { fmtFecha } from '../../lib/format';
+import Icon from '../common/Icon';
 import UsuarioModal from './UsuarioModal';
+
+const ROL_LABEL = {
+  admin: 'Administrador',
+  tienda: 'Tienda',
+  lider: 'Líder de Área',
+  usuario: 'Usuario',
+};
+
+// El rol es una etiqueta, no un estado: solo el administrador se resalta.
+const rolClase = (rol) => (rol === 'admin' ? 'badge-area' : 'badge-neutral');
 
 export default function Usuarios({ currentUser, onError }) {
   const [usuarios, setUsuarios] = useState([]);
@@ -43,7 +54,8 @@ export default function Usuarios({ currentUser, onError }) {
       <div className="toolbar">
         <h3 className="admin-h3">Usuarios del sistema</h3>
         <button className="btn btn-primary" onClick={() => setEditing({ nuevo: true })}>
-          + Nuevo usuario
+          <Icon name="mas" size={13} strokeWidth={2} />
+          Nuevo usuario
         </button>
       </div>
       <div className="table-wrap">
@@ -57,7 +69,7 @@ export default function Usuarios({ currentUser, onError }) {
               <th>Estado</th>
               <th>Último inicio</th>
               <th>Última IP</th>
-              <th>Acciones</th>
+              <th className="col-acciones">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -66,25 +78,7 @@ export default function Usuarios({ currentUser, onError }) {
                 <td data-label="Usuario" className="strong">{u.username}</td>
                 <td data-label="Nombre">{u.nombre}</td>
                 <td data-label="Rol">
-                  <span
-                    className={`badge badge-${
-                      u.rol === 'admin'
-                        ? 'mov'
-                        : u.rol === 'tienda'
-                        ? 'bajo'
-                        : u.rol === 'lider'
-                        ? 'area'
-                        : 'ok'
-                    }`}
-                  >
-                    {u.rol === 'admin'
-                      ? 'Administrador'
-                      : u.rol === 'tienda'
-                      ? 'Tienda'
-                      : u.rol === 'lider'
-                      ? 'Líder de Área'
-                      : 'Usuario'}
-                  </span>
+                  <span className={`badge ${rolClase(u.rol)}`}>{ROL_LABEL[u.rol] || u.rol}</span>
                 </td>
                 <td data-label="Tienda / Área">{u.tienda || u.area || '—'}</td>
                 <td data-label="Estado">
@@ -95,19 +89,33 @@ export default function Usuarios({ currentUser, onError }) {
                 <td data-label="Último inicio">{fmtFecha(u.ultimoLogin)}</td>
                 <td data-label="Última IP" className="mono">{u.ultimaIp || '—'}</td>
                 <td data-label="Acciones" className="actions">
-                  <button className="btn btn-sm" onClick={() => setEditing(u)}>
-                    Editar
-                  </button>
-                  {u.id !== currentUser.id && (
-                    <>
-                      <button className="btn btn-sm" onClick={() => toggleActivo(u)}>
-                        {u.activo ? 'Desactivar' : 'Activar'}
-                      </button>
-                      <button className="btn btn-sm btn-danger" onClick={() => borrar(u)}>
-                        Borrar
-                      </button>
-                    </>
-                  )}
+                  <div className="row-actions">
+                    <button className="icon-btn" onClick={() => setEditing(u)} title="Editar">
+                      <Icon name="lapiz" size={15} title="Editar" />
+                    </button>
+                    {u.id !== currentUser.id && (
+                      <>
+                        <button
+                          className="icon-btn"
+                          onClick={() => toggleActivo(u)}
+                          title={u.activo ? 'Desactivar' : 'Activar'}
+                        >
+                          <Icon
+                            name={u.activo ? 'prohibido' : 'check'}
+                            size={15}
+                            title={u.activo ? 'Desactivar' : 'Activar'}
+                          />
+                        </button>
+                        <button
+                          className="icon-btn icon-btn--danger"
+                          onClick={() => borrar(u)}
+                          title="Eliminar usuario"
+                        >
+                          <Icon name="basura" size={15} title="Eliminar usuario" />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
