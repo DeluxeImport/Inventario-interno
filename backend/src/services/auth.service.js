@@ -4,14 +4,9 @@ import { prisma } from '../lib/prisma.js';
 import { config } from '../config/env.js';
 import { publicUser } from '../utils/index.js';
 import { unauthorized, badRequest } from '../lib/AppError.js';
-import { SECCIONES, seccionDeRol } from '../constants/index.js';
+import { seccionDeRol, SECCION_LABEL } from '../constants/index.js';
 import { assertPasswordAllowed } from '../security/passwordPolicy.js';
 import * as actividad from './actividad.service.js';
-
-const ERROR_CRUCE_SECCION = {
-  [SECCIONES.ADMIN]: 'Esta cuenta pertenece al portal de Tiendas. Usa el acceso de Tiendas.',
-  [SECCIONES.TIENDA]: 'Esta cuenta es administrativa. Usa el acceso de Administración.',
-};
 
 export async function login({ username, password, seccion, ip }) {
   const user = await prisma.usuario.findUnique({ where: { username: (username || '').trim() } });
@@ -20,10 +15,12 @@ export async function login({ username, password, seccion, ip }) {
   const ok = await bcrypt.compare(password || '', user.passwordHash);
   if (!ok) throw unauthorized('Usuario o contraseña incorrectos.');
 
-  // Validar sección ANTES de emitir token: si el cliente eligió la pestaña
-  // equivocada, no debe existir un JWT capturable en la respuesta.
-  if (seccionDeRol(user.rol) !== seccion) {
-    throw unauthorized(ERROR_CRUCE_SECCION[seccion]);
+  // Validar el portal ANTES de emitir token: si el cliente eligió el portal
+  // equivocado, no debe existir un JWT capturable en la respuesta. El mensaje
+  // nombra el portal correcto para orientar al usuario.
+  const portalCorrecto = seccionDeRol(user.rol);
+  if (portalCorrecto !== seccion) {
+    throw unauthorized(`Esta cuenta ingresa por el portal de ${SECCION_LABEL[portalCorrecto]}.`);
   }
 
   await prisma.usuario.update({

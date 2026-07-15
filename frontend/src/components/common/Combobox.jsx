@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Icon from './Icon';
 
 const NUEVA = '__nueva__';
 
@@ -11,7 +12,9 @@ export default function Combobox({
   options,
   groups, // alternativa a options: [{ label, options: [...] }] para mostrar optgroups
   placeholder = 'Selecciona…',
-  nuevaLabel = '➕ Otra…',
+  // Texto de la opción "escribir un valor nuevo". Va dentro de un <option>,
+  // donde no se puede renderizar un SVG: por eso es texto plano.
+  nuevaLabel = 'Otra…',
   nuevaPlaceholder = 'Escribe un valor nuevo',
   required = false,
 }) {
@@ -38,7 +41,8 @@ export default function Combobox({
             onChange('');
           }}
         >
-          ↩ Lista
+          <Icon name="volver" size={13} />
+          Lista
         </button>
       </div>
     );

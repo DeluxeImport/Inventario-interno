@@ -1,13 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaCnotlient();
+const prisma = new PrismaClient();
 
 const PASS_INICIAL = 'lider123';
 const LIDERES = [
   { username: 'rrhh', nombre: 'Líder RR.HH', area: 'RR.HH' },
   { username: 'marketing', nombre: 'Líder Marketing', area: 'Marketing' },
   { username: 'logistica', nombre: 'Líder Logística', area: 'Logística' },
+  { username: 'sistemas', nombre: 'Líder Sistemas', area: 'Sistemas' },
 ];
 
 async function main() {

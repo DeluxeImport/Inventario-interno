@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../../api/client';
 import Modal from '../common/Modal';
 import Combobox from '../common/Combobox';
+import Icon from '../common/Icon';
 import { RESPONSABLES } from '../../constants';
 
 export default function MovimientoModal({ producto, onClose, onSaved, onError }) {
@@ -39,20 +40,24 @@ export default function MovimientoModal({ producto, onClose, onSaved, onError })
         <p className="muted">
           Stock completo actual: <strong>{producto.stockCompleto}</strong> {producto.unidad}
         </p>
-        <div className="seg">
+        <div className="seg" role="group" aria-label="Tipo de movimiento">
           <button
             type="button"
             className={tipo === 'ENTRADA' ? 'seg-on entrada' : ''}
             onClick={() => setTipo('ENTRADA')}
+            aria-pressed={tipo === 'ENTRADA'}
           >
-            ↓ Entrada
+            <Icon name="entrada" size={13} />
+            Entrada
           </button>
           <button
             type="button"
             className={tipo === 'SALIDA' ? 'seg-on salida' : ''}
             onClick={() => setTipo('SALIDA')}
+            aria-pressed={tipo === 'SALIDA'}
           >
-            ↑ Salida
+            <Icon name="salida" size={13} />
+            Salida
           </button>
         </div>
         <label>
@@ -99,7 +104,7 @@ export default function MovimientoModal({ producto, onClose, onSaved, onError })
             onChange={setResponsable}
             options={RESPONSABLES}
             placeholder="Seleccionar responsable…"
-            nuevaLabel="➕ Otro…"
+            nuevaLabel="Otro…"
             nuevaPlaceholder="Nombre del responsable"
           />
         </label>

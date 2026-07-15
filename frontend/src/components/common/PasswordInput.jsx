@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import Icon from './Icon';
 
-// Campo de contraseña con botón de ojo para mostrar/ocultar.
+// Campo de contraseña con botón para mostrar/ocultar el texto.
 export default function PasswordInput({ value, onChange, autoComplete, required, placeholder }) {
   const [show, setShow] = useState(false);
+  const etiqueta = show ? 'Ocultar contraseña' : 'Mostrar contraseña';
+
   return (
     <div className="pass-field">
       <input
@@ -17,11 +20,11 @@ export default function PasswordInput({ value, onChange, autoComplete, required,
         type="button"
         className="pass-toggle"
         onClick={() => setShow((s) => !s)}
-        aria-label={show ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-        title={show ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+        aria-label={etiqueta}
+        title={etiqueta}
         tabIndex={-1}
       >
-        {show ? '🙈' : '👁️'}
+        <Icon name={show ? 'ojoTachado' : 'ojo'} size={15} />
       </button>
     </div>
   );

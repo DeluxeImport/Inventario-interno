@@ -1,54 +1,131 @@
-/* Tokens de diseño y primitivos reutilizables (botones, tablas, inputs, badges). */
-/* Mobile-first: estilos base = móvil */
+/* Tokens y controles primitivos.
+   Lenguaje visual tomado de macOS (AppKit): materiales translúcidos, esquinas
+   continuas, hairlines de bajo contraste y un único azul de acento reservado a
+   lo interactivo. Los colores semánticos (verde/ámbar/rojo) NUNCA se usan para
+   navegación: solo comunican estado.
+
+   Tipografía del sistema: en macOS resuelve a SF Pro; en Windows 11 a Segoe UI
+   Variable. No se descarga ninguna fuente — cero peticiones de red, sin FOUT. */
 
 :root {
-  /* Colores */
-  --bg: #f1f5f9;
-  --panel: #ffffff;
-  --ink: #0f172a;
-  --muted: #64748b;
-  --line: #e2e8f0;
-  --primary: #2563eb;
-  --primary-dark: #1d4ed8;
-  --ok: #16a34a;
-  --warn: #d97706;
-  --danger: #dc2626;
-  --mov: #7c3aed;
+  color-scheme: light dark;
 
-  /* Tipografía fluida */
-  --fs-xs: clamp(0.6875rem, 1.5vw + 0.25rem, 0.75rem);
-  --fs-sm: clamp(0.75rem, 1.5vw + 0.3rem, 0.8125rem);
-  --fs-base: clamp(0.8125rem, 1.5vw + 0.35rem, 0.875rem);
-  --fs-md: clamp(0.875rem, 1.5vw + 0.4rem, 0.9375rem);
-  --fs-lg: clamp(1rem, 2vw + 0.5rem, 1.125rem);
-  --fs-xl: clamp(1.125rem, 2vw + 0.6rem, 1.375rem);
-  --fs-2xl: clamp(1.25rem, 3vw + 0.7rem, 1.5rem);
-  --fs-3xl: clamp(1.5rem, 4vw + 0.8rem, 1.875rem);
+  /* Materiales y fondos */
+  --bg: #e6e6ea;              /* cromo de la ventana (más gris para que los paneles resalten) */
+  --sidebar: rgba(244, 244, 247, 0.75);
+  --sidebar-solid: #f4f4f7;
+  --panel: #ffffff;           /* contenido */
+  --panel-2: #f5f5f8;         /* filas alternas, cabeceras de tabla */
+  --overlay: rgba(0, 0, 0, 0.30);
 
-  /* Espaciado fluido */
-  --sp-2xs: clamp(0.125rem, 0.5vw, 0.25rem);
-  --sp-xs: clamp(0.25rem, 1vw, 0.375rem);
-  --sp-sm: clamp(0.375rem, 1.5vw, 0.5rem);
-  --sp-md: clamp(0.5rem, 2vw, 0.75rem);
-  --sp-lg: clamp(0.75rem, 3vw, 1rem);
-  --sp-xl: clamp(1rem, 4vw, 1.5rem);
-  --sp-2xl: clamp(1.5rem, 5vw, 2rem);
+  /* Texto */
+  --ink: #1d1d1f;             /* label */
+  --ink-2: rgba(60, 60, 67, 0.78);   /* secondary label */
+  --ink-3: rgba(60, 60, 67, 0.56);   /* tertiary label */
+  --muted: var(--ink-3);
 
-  /* Border radius fluido */
-  --radius-sm: clamp(0.375rem, 1vw, 0.5rem);
-  --radius-md: clamp(0.5rem, 1.5vw, 0.75rem);
-  --radius-lg: clamp(0.75rem, 2vw, 1rem);
-  --radius-xl: clamp(1rem, 3vw, 1.25rem);
+  /* Trazos (más marcados que un macOS puro: en pantallas variadas se veían lavados) */
+  --line: rgba(0, 0, 0, 0.14);
+  --line-2: rgba(0, 0, 0, 0.20);
+  --line-strong: rgba(0, 0, 0, 0.30);
 
-  /* Sombras */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
-  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
+  /* Acento: exclusivo de lo interactivo/seleccionado */
+  --accent: #007aff;
+  --accent-press: #0062cc;
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(0, 122, 255, 0.13);
+  --focus: rgba(0, 122, 255, 0.30);
 
-  /* Transiciones */
-  --transition-fast: 150ms ease;
-  --transition-normal: 250ms ease;
-  --transition-slow: 350ms ease;
+  /* Semánticos: exclusivos de estado (fondos con cuerpo, no lavados) */
+  --green: #34c759;
+  --green-ink: #1c7a35;
+  --green-soft: rgba(52, 199, 89, 0.22);
+  --amber: #ff9500;
+  --amber-ink: #97530a;
+  --amber-soft: rgba(255, 149, 0, 0.24);
+  --red: #ff3b30;
+  --red-ink: #c22219;
+  --red-soft: rgba(255, 59, 48, 0.18);
+  --violet: #af52de;
+  --violet-ink: #7d2fa8;
+  --violet-soft: rgba(175, 82, 222, 0.18);
+  --teal: #0d9aa8;
+  --teal-soft: rgba(13, 154, 168, 0.18);
+
+  /* Tarjeta destacada del dashboard. En claro casi-negro para resaltar sobre
+     el fondo claro; en oscuro se redefine para no fundirse con el panel. */
+  --hero-grad: linear-gradient(170deg, #2c2c2e, #1c1c1e);
+  --hero-ink: #ffffff;
+  --hero-sub: rgba(235, 235, 245, 0.58);
+
+  /* Métrica: los controles de macOS son compactos */
+  --h-control: 28px;
+  --h-control-sm: 22px;
+  --r-control: 6px;
+  --r-panel: 10px;
+  --r-modal: 12px;
+  --r-pill: 980px;
+
+  /* Elevación: sutil, nunca difusa */
+  --shadow-control: 0 1px 1.5px rgba(0, 0, 0, 0.09);
+  --shadow-panel: 0 1px 2px rgba(0, 0, 0, 0.07), 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+  --shadow-pop: 0 12px 34px rgba(0, 0, 0, 0.18), 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
+    'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas,
+    'Cascadia Mono', 'Liberation Mono', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1c1e;
+    --sidebar: rgba(38, 38, 41, 0.72);
+    --sidebar-solid: #262629;
+    --panel: #1e1e20;
+    --panel-2: #252528;
+    --overlay: rgba(0, 0, 0, 0.5);
+
+    --ink: #f5f5f7;
+    --ink-2: rgba(235, 235, 245, 0.66);
+    --ink-3: rgba(235, 235, 245, 0.42);
+
+    --line: rgba(255, 255, 255, 0.12);
+    --line-2: rgba(255, 255, 255, 0.18);
+    --line-strong: rgba(255, 255, 255, 0.28);
+
+    --accent: #0a84ff;
+    --accent-press: #409cff;
+    --accent-soft: rgba(10, 132, 255, 0.18);
+    --focus: rgba(10, 132, 255, 0.42);
+
+    --green: #30d158;
+    --green-ink: #4fdb75;
+    --green-soft: rgba(48, 209, 88, 0.16);
+    --amber: #ff9f0a;
+    --amber-ink: #ffb340;
+    --amber-soft: rgba(255, 159, 10, 0.16);
+    --red: #ff453a;
+    --red-ink: #ff6961;
+    --red-soft: rgba(255, 69, 58, 0.16);
+    --violet: #bf5af2;
+    --violet-ink: #d08cf5;
+    --violet-soft: rgba(191, 90, 242, 0.18);
+    --teal: #40c8e0;
+    --teal-soft: rgba(64, 200, 224, 0.16);
+
+    /* Azul apizarrado elevado: resalta como tarjeta destacada sobre el panel
+       oscuro, donde el casi-negro del tema claro se perdería. */
+    --hero-grad: linear-gradient(165deg, #35507f, #222f4c);
+    --hero-ink: #ffffff;
+    --hero-sub: rgba(235, 235, 245, 0.7);
+
+    --shadow-control: 0 1px 1.5px rgba(0, 0, 0, 0.4);
+    --shadow-panel: 0 1px 2px rgba(0, 0, 0, 0.35), 0 0 0 0.5px rgba(255, 255, 255, 0.06);
+    --shadow-pop: 0 12px 34px rgba(0, 0, 0, 0.6), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+  }
 }
 
 * {
@@ -57,313 +134,211 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  -moz-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-size: var(--fs-base);
-  line-height: 1.55;
-  letter-spacing: -0.005em;
   background: var(--bg);
   color: var(--ink);
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.45;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: 'ss01', 'cv11';
 }
 
-h1, h2, h3, h4 {
-  letter-spacing: -0.02em;
-  font-weight: 700;
+h1, h2, h3 {
+  margin: 0;
+  font-weight: 590;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
 }
+h1 { font-size: 20px; }
+h2 { font-size: 15px; }
+h3 { font-size: 14px; }
 
-/* ---- Inputs ---- */
-input,
-select {
-  padding: var(--sp-sm) var(--sp-md);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  font-size: var(--fs-base);
-  font-family: inherit;
-  background: #fff;
-  min-height: 44px;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+.muted { color: var(--ink-3); }
+.strong { color: var(--ink); font-weight: 510; }
+.center { text-align: center; }
+.mono {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
 }
-
-input:focus,
-select:focus {
-  outline: 2px solid var(--primary);
-  border-color: var(--primary);
-}
-
-/* Campo de contraseña con ojo */
-.pass-field {
-  position: relative;
-  display: flex;
-  width: 100%;
-}
-
-.pass-field input {
-  width: 100%;
-  padding-right: 2.75rem;
-}
-
-.pass-toggle {
-  position: absolute;
-  right: 0.25rem;
-  top: 50%;
-  transform: translateY(-50%);
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  font-size: 1.125rem;
-  line-height: 1;
-  padding: 0.5rem;
-  color: var(--muted);
-  min-width: 44px;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pass-toggle:hover {
-  opacity: 0.7;
-}
-
-/* ---- Botones ---- */
-.btn {
-  border: 1px solid var(--line);
-  background: #fff;
-  padding: var(--sp-sm) var(--sp-md);
-  border-radius: var(--radius-md);
-  font-size: var(--fs-base);
-  font-weight: 600;
-  cursor: pointer;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-xs);
-  min-height: 44px;
-  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
-}
-
-.btn:hover {
-  background: #f8fafc;
-}
-
-.btn-primary {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #fff;
-}
-
-.btn-primary:hover {
-  background: var(--primary-dark);
-}
-
-.btn-sm {
-  padding: var(--sp-xs) var(--sp-sm);
-  font-size: var(--fs-sm);
-  min-height: 36px;
-}
-
-.btn-danger {
-  color: var(--danger);
-  border-color: #fecaca;
-}
-
-.btn-danger:hover {
-  background: #fef2f2;
-}
-
-.btn-mov {
-  color: var(--mov);
-  border-color: #ddd6fe;
-}
-
-.btn-mov:hover {
-  background: #f5f3ff;
-}
-
-.icon-btn {
-  border: 0;
-  background: transparent;
-  font-size: 1.125rem;
-  cursor: pointer;
-  color: var(--muted);
-  min-width: 44px;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ---- Tablas ---- */
-.table-wrap {
-  background: var(--panel);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  border: 1px solid var(--line);
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--fs-base);
-}
-
-th,
-td {
-  padding: var(--sp-sm) var(--sp-md);
-  text-align: left;
-  border-bottom: 1px solid var(--line);
-  white-space: nowrap;
-}
-
-th {
-  background: #f8fafc;
-  color: var(--muted);
-  font-size: var(--fs-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  font-weight: 600;
-}
-
-tbody tr:last-child td {
-  border-bottom: 0;
-}
-
-tbody tr:hover {
-  background: #f8fafc;
-}
-
-/* Responsive table - mobile (las filas se transforman en tarjetas en responsive.css).
-   Importante: NO forzar min-width aquí; eso reintroduce el scroll horizontal que el
-   modo tarjeta busca evitar. La tabla ocupa el ancho disponible y las celdas se apilan. */
-@media (max-width: 639px) {
-  .table-wrap {
-    margin: 0 calc(-1 * var(--sp-md));
-    border-radius: 0;
-    border-left: 0;
-    border-right: 0;
-    overflow-x: hidden;
-  }
-
-  .table-wrap table {
-    display: block;
-    min-width: 0;
-    width: 100%;
-  }
-
-  table {
-    font-size: var(--fs-sm);
-  }
-
-  th, td {
-    padding: var(--sp-xs) var(--sp-sm);
-  }
-}
-
-/* ---- Utilidades ---- */
 .num {
   text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
 }
 
-.strong {
-  font-weight: 700;
+/* Los iconos se alinean ópticamente con el texto que acompañan. */
+.icon {
+  flex: none;
+  vertical-align: -0.14em;
 }
 
-.center {
-  text-align: center;
+/* Anillo de foco del sistema: nunca se elimina, solo se estiliza. */
+:where(button, input, select, textarea, a, [tabindex]):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3.5px var(--focus);
+  border-color: var(--accent);
+  z-index: 1;
+  position: relative;
 }
 
-.muted {
-  color: var(--muted);
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
-.mono {
-  font-family: 'Consolas', 'Courier New', monospace;
-  font-size: var(--fs-sm);
-}
+/* ---------------- Botones ---------------- */
+/* El botón por defecto de macOS: fondo claro, hairline, sombra de 1px. */
 
-.row-alert {
-  background: #fffbeb;
-}
-
-.row-alert:hover {
-  background: #fef3c7;
-}
-
-.actions {
-  display: flex;
-  gap: var(--sp-xs);
-  flex-wrap: wrap;
-}
-
-/* ---- Badges ---- */
-.badge {
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  padding: var(--sp-2xs) var(--sp-sm);
-  border-radius: 999px;
+.btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: var(--h-control);
+  padding: 0 11px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--panel);
+  border: 0.5px solid var(--line-2);
+  border-radius: var(--r-control);
+  box-shadow: var(--shadow-control);
+  cursor: pointer;
   white-space: nowrap;
+  transition: background 120ms var(--ease), transform 60ms var(--ease);
+}
+.btn:hover { background: var(--panel-2); }
+.btn:active { background: var(--line); transform: scale(0.985); }
+.btn:disabled { opacity: 0.42; cursor: default; box-shadow: none; }
+.btn:disabled:active { transform: none; }
+
+.btn-primary {
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-color: transparent;
+}
+.btn-primary:hover { background: var(--accent-press); }
+.btn-primary:active { background: var(--accent-press); }
+
+.btn-danger { color: var(--red-ink); }
+.btn-danger:hover { background: var(--red-soft); }
+
+.btn-ok { color: var(--accent-ink); background: var(--green); border-color: transparent; }
+.btn-ok:hover { background: var(--green); filter: brightness(0.94); }
+
+.btn-mov { color: var(--accent); }
+.btn-mov:hover { background: var(--accent-soft); }
+
+.btn-sm {
+  min-height: var(--h-control-sm);
+  padding: 0 8px;
+  font-size: 12px;
+  border-radius: 5px;
 }
 
-.badge-ok {
-  background: #dcfce7;
-  color: var(--ok);
+/* Botón de solo icono (cerrar modal, acciones de fila). */
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  color: var(--ink-2);
+  background: none;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 110ms var(--ease), color 110ms var(--ease);
+}
+.icon-btn:hover { background: var(--accent-soft); color: var(--accent); }
+.icon-btn:active { background: var(--line); }
+.icon-btn--danger:hover { background: var(--red-soft); color: var(--red-ink); }
+
+/* ---------------- Campos ---------------- */
+
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 510;
+  color: var(--ink-2);
+}
+label > input,
+label > select,
+label > textarea,
+label > .pass-field,
+label > .combo-nueva,
+label > select.control {
+  margin-top: 5px;
 }
 
-.badge-bajo {
-  background: #fef3c7;
-  color: var(--warn);
+input[type='text'],
+input[type='password'],
+input[type='number'],
+input[type='search'],
+input:not([type]),
+select,
+textarea {
+  width: 100%;
+  min-height: var(--h-control);
+  padding: 4px 9px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink);
+  background: var(--panel);
+  border: 0.5px solid var(--line-2);
+  border-radius: var(--r-control);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.04);
+  transition: border-color 120ms var(--ease), box-shadow 120ms var(--ease);
+}
+textarea { min-height: 60px; padding: 7px 9px; resize: vertical; line-height: 1.45; }
+input::placeholder, textarea::placeholder { color: var(--ink-3); }
+input:disabled, select:disabled { color: var(--ink-3); background: var(--panel-2); }
+input[type='number'] { font-variant-numeric: tabular-nums; }
+
+/* El chevron del select: dibujado, no un glifo tipográfico. */
+select {
+  appearance: none;
+  padding-right: 26px;
+  cursor: pointer;
+  background-image:
+    linear-gradient(45deg, transparent 48%, currentColor 48%, currentColor 56%, transparent 56%),
+    linear-gradient(-45deg, transparent 48%, currentColor 48%, currentColor 56%, transparent 56%);
+  background-position: calc(100% - 14px) calc(50% + 2.5px), calc(100% - 9.5px) calc(50% + 2.5px);
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
 }
 
-.badge-agotado {
-  background: #fee2e2;
-  color: var(--danger);
-}
-
-.badge-mov {
-  background: #ede9fe;
-  color: var(--mov);
-}
-
-.badge-area {
-  background: #dbeafe;
-  color: #1d4ed8;
-}
-
-/* ---- Focus visible para accesibilidad ---- */
-:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* ---- Scrollbar styling ---- */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
+input[type='checkbox'] {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  flex: none;
+  border: 0.5px solid var(--line-strong);
   border-radius: 4px;
+  background: var(--panel);
+  box-shadow: var(--shadow-control);
+  cursor: pointer;
+  transition: background 110ms var(--ease), border-color 110ms var(--ease);
 }
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+input[type='checkbox']:checked {
+  background: var(--accent);
+  border-color: transparent;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3.6 8.4 2.8 2.8 5.9-6.4'/%3E%3C/svg%3E");
+  background-size: 13px;
+  background-position: center;
+  background-repeat: no-repeat;
 }

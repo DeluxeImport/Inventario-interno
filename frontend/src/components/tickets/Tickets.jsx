@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../api/client';
 import { esSolicitante } from '../../constants';
+import { fmtFechaCorta } from '../../lib/format';
+import Icon from '../common/Icon';
 
 const ESTADOS = {
   PENDIENTE: ['bajo', 'Pendiente'],
@@ -8,7 +10,6 @@ const ESTADOS = {
   ENTREGADO: ['ok', 'Entregado'],
   RECHAZADO: ['agotado', 'Rechazado'],
 };
-const fmt = (f) => new Date(f).toLocaleString('es-PE');
 
 function EstadoTicket({ estado }) {
   const [cls, label] = ESTADOS[estado] || ESTADOS.PENDIENTE;
@@ -49,7 +50,7 @@ function NuevoTicketModal({ onClose, onSaved, onError }) {
 
   const guardar = async (e) => {
     e.preventDefault();
-    if (items.length === 0) return onError('Agrega al menos un producto.');
+    if (items.length === 0) return onError('Agrega al menos un Producto.');
     try {
       await api.crearTicket({
         area,
@@ -64,11 +65,11 @@ function NuevoTicketModal({ onClose, onSaved, onError }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal modal-wide" onClick={(e) => e.stopPropagation()}>
+      <div className="modal modal-wide" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
         <div className="modal-head">
           <h3>Nueva solicitud</h3>
-          <button className="icon-btn" onClick={onClose}>
-            ✕
+          <button className="icon-btn" onClick={onClose} title="Cerrar">
+            <Icon name="cerrar" size={15} title="Cerrar" />
           </button>
         </div>
         <form className="form" onSubmit={guardar}>
@@ -99,7 +100,7 @@ function NuevoTicketModal({ onClose, onSaved, onError }) {
                 value={prodSel}
                 onChange={(e) => setProdSel(e.target.value)}
               >
-                <option value="">Elegir producto...</option>
+                <option value="">Elegir producto…</option>
                 {solicitables.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.producto} ({p.categoria}) · stock {p.stockCompleto}
@@ -123,6 +124,7 @@ function NuevoTicketModal({ onClose, onSaved, onError }) {
                   onClick={agregar}
                   disabled={!prodSel}
                 >
+                  <Icon name="mas" size={13} strokeWidth={2} />
                   Agregar al pedido
                 </button>
               </div>
@@ -137,8 +139,13 @@ function NuevoTicketModal({ onClose, onSaved, onError }) {
                   <span className="cart-qty">
                     {i.cantidad} {i.unidad}
                   </span>
-                  <button type="button" className="icon-btn" onClick={() => quitar(i.productoId)}>
-                    ✕
+                  <button
+                    type="button"
+                    className="icon-btn icon-btn--danger"
+                    onClick={() => quitar(i.productoId)}
+                    title={`Quitar ${i.producto}`}
+                  >
+                    <Icon name="cerrar" size={14} title={`Quitar ${i.producto}`} />
                   </button>
                 </div>
               ))}
@@ -211,17 +218,17 @@ function ProcesarTicketModal({ ticket, onClose, onDone, onError }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal modal-wide" onClick={(e) => e.stopPropagation()}>
+      <div className="modal modal-wide" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
         <div className="modal-head">
           <h3>Procesar {ticket.codigo}</h3>
-          <button className="icon-btn" onClick={onClose}>
-            ✕
+          <button className="icon-btn" onClick={onClose} title="Cerrar">
+            <Icon name="cerrar" size={15} title="Cerrar" />
           </button>
         </div>
         <div className="form">
           <p className="muted">
-            Ajusta la cantidad a entregar. Usa <strong>0</strong> o el botón ⊘ para rechazar un ítem
-            sin descontar stock.
+            Ajusta la cantidad a entregar. Pon <strong>0</strong> o rechaza el ítem para no
+            descontar stock de ese producto.
           </p>
           <div className="proc-items">
             {items.map((i) => {
@@ -241,6 +248,7 @@ function ProcesarTicketModal({ ticket, onClose, onDone, onError }) {
                       value={i.cantidad}
                       onChange={(e) => setCant(i.id, e.target.value)}
                       className="cant-input"
+                      aria-label={`Cantidad de ${i.producto}`}
                     />
                   )}
                   <span className="proc-uni">{i.unidad}</span>
@@ -249,18 +257,17 @@ function ProcesarTicketModal({ ticket, onClose, onDone, onError }) {
                       type="button"
                       className="btn btn-sm"
                       onClick={() => restaurarItem(i.id, i.solicitada)}
-                      title="Restaurar este ítem"
                     >
                       Restaurar
                     </button>
                   ) : (
                     <button
                       type="button"
-                      className="btn btn-sm btn-danger"
+                      className="icon-btn icon-btn--danger"
                       onClick={() => rechazarItem(i.id)}
-                      title="Rechazar solo este ítem"
+                      title={`Rechazar ${i.producto}`}
                     >
-                      ⊘
+                      <Icon name="prohibido" size={15} title={`Rechazar ${i.producto}`} />
                     </button>
                   )}
                 </div>
@@ -298,75 +305,110 @@ function ProcesarTicketModal({ ticket, onClose, onDone, onError }) {
   );
 }
 
-// ---------- Tarjeta de ticket ----------
+// ---------- Fila de ticket ----------
 function TicketCard({ ticket, esAdmin, onProcesar }) {
   const procesable = ticket.estado === 'PENDIENTE' || ticket.estado === 'APROBADO';
-  return (
-    <div className="ticket-card">
-      <div className="ticket-top">
-        <div>
-          <span className="ticket-cod">{ticket.codigo}</span>
-          <EstadoTicket estado={ticket.estado} />
-        </div>
-        <span className="ticket-fecha">{fmt(ticket.createdAt)}</span>
-      </div>
-      <div className="ticket-meta">
-        {(ticket.solicitante?.tienda || ticket.solicitante?.area) && (
-          <span>
-            {ticket.solicitante?.tienda ? '🏬' : '🏢'}{' '}
-            <strong>{ticket.solicitante.tienda || ticket.solicitante.area}</strong>
-          </span>
-        )}
-        <span>👤 {ticket.solicitante?.nombre}</span>
-        {ticket.area && <span>🏷️ {ticket.area}</span>}
-      </div>
-      <ul className="ticket-items">
-        {ticket.items.map((it) => {
-          const rechazado = it.cantidadAprobada === 0;
-          const ajustada =
-            !rechazado && it.cantidadAprobada != null && it.cantidadAprobada !== it.cantidad;
-          return (
-            <li key={it.id} className={rechazado ? 'ticket-item--rechazado' : undefined}>
-              <span>{it.producto?.producto}</span>
-              {rechazado ? (
-                <strong className="qty-rech">
-                  <s>
-                    {it.cantidad} {it.producto?.unidad}
-                  </s>{' '}
-                  <span className="badge badge-agotado">Rechazado</span>
-                </strong>
-              ) : ajustada ? (
-                <strong className="qty-adj">
-                  <s>{it.cantidad}</s> → {it.cantidadAprobada} {it.producto?.unidad}
-                </strong>
-              ) : (
-                <strong>
-                  {it.cantidad} {it.producto?.unidad}
-                </strong>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-      {ticket.nota && <p className="ticket-nota">📝 {ticket.nota}</p>}
-      {ticket.observacionAdmin && (
-        <p className="ticket-nota criterio">📋 Criterio: {ticket.observacionAdmin}</p>
-      )}
-      {ticket.estado === 'RECHAZADO' && ticket.motivoRechazo && (
-        <p className="ticket-nota rechazo">❌ {ticket.motivoRechazo}</p>
-      )}
-      {ticket.atendidoPor && ticket.estado !== 'PENDIENTE' && (
-        <p className="ticket-aten">Atendido por {ticket.atendidoPor.nombre}</p>
-      )}
+  const origen = ticket.solicitante?.tienda || ticket.solicitante?.area;
+  const esTienda = !!ticket.solicitante?.tienda;
+  // Las cuentas de tienda suelen llamarse igual que la tienda: no repetimos el
+  // mismo nombre dos veces en la misma línea.
+  const nombre = ticket.solicitante?.nombre;
+  const mostrarNombre = nombre && nombre !== origen;
 
-      {esAdmin && procesable && (
-        <div className="ticket-actions">
-          <button className="btn btn-sm btn-primary" onClick={() => onProcesar(ticket)}>
-            Procesar
-          </button>
+  return (
+    <article className="ticket-card">
+      <div className="ticket-top">
+        <span className="ticket-cod">{ticket.codigo}</span>
+        <span className="ticket-fecha">{fmtFechaCorta(ticket.createdAt)}</span>
+      </div>
+
+      <div>
+        <div className="ticket-meta">
+          {origen && (
+            <span>
+              <Icon name={esTienda ? 'tienda' : 'edificio'} size={14} />
+              <strong>{origen}</strong>
+            </span>
+          )}
+          {mostrarNombre && (
+            <span>
+              <Icon name="persona" size={14} />
+              {nombre}
+            </span>
+          )}
+          {ticket.area && (
+            <span>
+              <Icon name="etiqueta" size={14} />
+              {ticket.area}
+            </span>
+          )}
         </div>
-      )}
-    </div>
+
+        <ul className="ticket-items">
+          {ticket.items.map((it) => {
+            const rechazado = it.cantidadAprobada === 0;
+            const ajustada =
+              !rechazado && it.cantidadAprobada != null && it.cantidadAprobada !== it.cantidad;
+            return (
+              <li key={it.id} className={rechazado ? 'ticket-item--rechazado' : undefined}>
+                <span>{it.producto?.producto}</span>
+                {rechazado ? (
+                  <strong className="qty-rech">
+                    <s>
+                      {it.cantidad} {it.producto?.unidad}
+                    </s>
+                    <span className="badge badge-agotado">Rechazado</span>
+                  </strong>
+                ) : ajustada ? (
+                  <strong className="qty-adj">
+                    <s>{it.cantidad}</s>
+                    <Icon name="volver" size={12} className="flip" />
+                    {it.cantidadAprobada} {it.producto?.unidad}
+                  </strong>
+                ) : (
+                  <strong>
+                    {it.cantidad} {it.producto?.unidad}
+                  </strong>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+
+        {ticket.nota && (
+          <p className="ticket-nota">
+            <Icon name="nota" size={14} />
+            {ticket.nota}
+          </p>
+        )}
+        {ticket.observacionAdmin && (
+          <p className="ticket-nota criterio">
+            <Icon name="lista" size={14} />
+            Criterio: {ticket.observacionAdmin}
+          </p>
+        )}
+        {ticket.estado === 'RECHAZADO' && ticket.motivoRechazo && (
+          <p className="ticket-nota rechazo">
+            <Icon name="errorCirculo" size={14} />
+            {ticket.motivoRechazo}
+          </p>
+        )}
+        {ticket.atendidoPor && ticket.estado !== 'PENDIENTE' && (
+          <p className="ticket-aten">Atendido por {ticket.atendidoPor.nombre}</p>
+        )}
+      </div>
+
+      <div className="ticket-right">
+        <EstadoTicket estado={ticket.estado} />
+        {esAdmin && procesable && (
+          <div className="ticket-actions">
+            <button className="btn btn-sm btn-primary" onClick={() => onProcesar(ticket)}>
+              Procesar
+            </button>
+          </div>
+        )}
+      </div>
+    </article>
   );
 }
 
@@ -401,24 +443,26 @@ export default function Tickets({ user, onError, onChanged }) {
               key={f}
               className={`chip ${filtro === f ? 'chip-on' : ''}`}
               onClick={() => setFiltro(f)}
+              aria-pressed={filtro === f}
             >
-              {f === 'TODOS' ? 'Todos' : ESTADOS[f][1]}
+              {f === 'TODOS' ? 'Todas' : ESTADOS[f][1]}
             </button>
           ))}
         </div>
         {esSolicitante(user.rol) && (
           <button className="btn btn-primary" onClick={() => setNuevo(true)}>
-            + Nueva solicitud
+            <Icon name="mas" size={13} strokeWidth={2} />
+            Nueva solicitud
           </button>
         )}
       </div>
 
       {tickets.length === 0 ? (
-        <p className="muted center" style={{ padding: '40px 0' }}>
-          No hay solicitudes {filtro !== 'TODOS' ? `en estado "${ESTADOS[filtro][1]}"` : ''}.
+        <p className="vacio">
+          No hay solicitudes {filtro !== 'TODOS' ? `en estado «${ESTADOS[filtro][1]}»` : ''}.
         </p>
       ) : (
-        <div className="tickets-grid">
+        <div className="tickets-lista">
           {tickets.map((t) => (
             <TicketCard key={t.id} ticket={t} esAdmin={esAdmin} onProcesar={setProcesando} />
           ))}

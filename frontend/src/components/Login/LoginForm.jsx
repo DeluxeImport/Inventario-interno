@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api, setToken } from '../../api/client';
 import useParallax from '../../hooks/useParallax';
+import Icon from '../common/Icon';
 import PasswordInput from '../common/PasswordInput';
 import { SECCIONES } from './secciones';
 import CarruselTiendas from './CarruselTiendas';
@@ -43,7 +44,8 @@ export default function LoginForm({ seccion, onVolver, onLogin }) {
     >
       <form className={`login-card login-card--${seccion}`} onSubmit={entrar}>
         <button type="button" className="login-back" onClick={onVolver}>
-          ← Volver
+          <Icon name="volver" size={13} />
+          Volver
         </button>
         <div className="login-logo">
           <s.Icono size={72} />

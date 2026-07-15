@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { api } from '../../api/client';
 import Modal from '../common/Modal';
 import Combobox from '../common/Combobox';
+import Icon from '../common/Icon';
 
 // Unidad de medida: una simple etiqueta de cómo se cuenta el producto.
 const UNIDADES = ['Unidad', 'Paquete', 'Caja', 'Docena', 'Bolsa', 'Rollo', 'Par', 'Metro', 'Litro', 'Frasco'];
@@ -32,7 +33,7 @@ export default function ProductoModal({ producto, categorias, onClose, onSaved, 
             onChange={(v) => set('categoria', v)}
             options={categorias}
             placeholder="Selecciona una categoría…"
-            nuevaLabel="➕ Otra categoría…"
+            nuevaLabel="Otra categoría…"
             nuevaPlaceholder="Nueva categoría"
             required
           />
@@ -48,7 +49,7 @@ export default function ProductoModal({ producto, categorias, onClose, onSaved, 
             onChange={(v) => set('unidad', v)}
             options={UNIDADES}
             placeholder="Selecciona una unidad…"
-            nuevaLabel="➕ Otra unidad…"
+            nuevaLabel="Otra unidad…"
             nuevaPlaceholder="Nueva unidad"
           />
         </label>
@@ -88,8 +89,11 @@ export default function ProductoModal({ producto, categorias, onClose, onSaved, 
             onChange={(e) => set('solicitable', e.target.checked)}
           />
           <span>
-            🎫 Solicitable por ticket
-            <small>Permite que los usuarios pidan este producto en una solicitud.</small>
+            <span className="check-title">
+              <Icon name="ticket" size={14} />
+              Solicitable por ticket
+            </span>
+            <small>Permite que las tiendas pidan este producto en una solicitud.</small>
           </span>
         </label>
         <div className="modal-foot">

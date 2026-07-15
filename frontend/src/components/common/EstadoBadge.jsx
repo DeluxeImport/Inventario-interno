@@ -1,5 +1,5 @@
 const MAP = {
-  OK: ['ok', 'OK'],
+  OK: ['ok', 'Suficiente'],
   BAJO: ['bajo', 'Stock bajo'],
   AGOTADO: ['agotado', 'Agotado'],
 };

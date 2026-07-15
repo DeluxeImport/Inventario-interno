@@ -1,556 +1,441 @@
-/* Estructura general: contenedor, header/nav, caja de usuario, login. */
-/* Mobile-first: estilos base = móvil */
+/* Estructura de la ventana: barra lateral translúcida + área de contenido,
+   como una ventana de documento de macOS. La sidebar es el material vibrante;
+   el contenido, la superficie opaca sobre la que se trabaja. */
 
-/* App container - fluido */
 .app {
-  padding: 0 clamp(0.75rem, 3vw, 1rem) clamp(2rem, 5vw, 3rem);
+  display: grid;
+  grid-template-columns: 216px minmax(0, 1fr);
+  /* Fila limitada al alto de la ventana: sin esto la fila implícita se ajusta
+     al contenido, `main` crece sin límite y todo lo que pasa del viewport
+     queda recortado por `overflow: hidden` — sin scroll. */
+  grid-template-rows: minmax(0, 1fr);
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
-@media (min-width: 1024px) {
-  .app {
-    max-width: 75rem;
-    margin: 0 auto;
-  }
-}
-
-@media (min-width: 1280px) {
-  .app {
-    max-width: 80rem;
-  }
-}
-
-/* Header - mobile first: apilado */
-header {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: clamp(0.5rem, 2vw, 0.75rem);
-  padding: clamp(0.75rem, 3vw, 1.125rem) 0;
-}
-
-@media (min-width: 640px) {
-  header {
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: clamp(0.5rem, 2vw, 0.75rem);
-  }
-}
-
-/* Brand - fluido */
-.brand {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-md);
-  justify-content: center;
-  text-align: center;
-}
-
-@media (min-width: 640px) {
-  .brand {
-    justify-content: flex-start;
-    text-align: left;
-  }
-}
-
-.logo {
-  font-size: clamp(1.5rem, 5vw, 2.125rem);
-}
-
-.brand h1 {
-  margin: 0;
-  font-size: clamp(1rem, 4vw, 1.375rem);
-}
-
-.brand p {
-  margin: 0;
-  color: var(--muted);
-  font-size: var(--fs-sm);
-}
-
-/* Nav - mobile first: oculto, se muestra con hamburger */
-nav {
-  display: none;
-  flex-direction: column;
-  background: var(--panel);
-  padding: var(--sp-sm);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  gap: var(--sp-2xs);
-}
-
-@media (min-width: 640px) {
-  nav {
-    display: flex;
-    flex-direction: row;
-    position: static;
-    gap: 0.375rem;
-    padding: 0.3125rem;
-  }
-}
-
-nav button {
-  position: relative;
-  border: 0;
-  background: transparent;
-  padding: clamp(0.75rem, 3vw, 0.875rem) clamp(0.875rem, 3vw, 1rem);
-  border-radius: var(--radius-md);
-  font-size: var(--fs-base);
-  font-weight: 600;
-  color: var(--muted);
-  cursor: pointer;
-  min-height: 44px;
-  transition: background var(--transition-fast), color var(--transition-fast);
-}
-
-@media (min-width: 640px) {
-  nav button {
-    padding: clamp(0.5rem, 2vw, 0.625rem) clamp(0.875rem, 3vw, 1rem);
-    white-space: nowrap;
-  }
-}
-
-nav button.nav-on {
-  background: var(--primary);
-  color: #fff;
-}
-
-.dot {
-  position: absolute;
-  top: -0.25rem;
-  right: -0.25rem;
-  background: var(--danger);
-  color: #fff;
-  font-size: 0.6875rem;
-  min-width: 1.125rem;
-  height: 1.125rem;
-  border-radius: 9px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 0.25rem;
-}
-
-/* User box - mobile first: compacto */
-.user-box {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-sm);
-  justify-content: center;
-}
-
-@media (min-width: 640px) {
-  .user-box {
-    justify-content: flex-end;
-    gap: var(--sp-md);
-    margin-left: auto;
-  }
-}
-
-.user-info {
-  display: none;
-  flex-direction: column;
-  align-items: flex-end;
-  line-height: 1.2;
-}
-
-@media (min-width: 640px) {
-  .user-info {
-    display: flex;
-  }
-}
-
-.user-info strong {
-  font-size: var(--fs-base);
-}
-
-.user-info span {
-  font-size: var(--fs-xs);
-  color: var(--muted);
-}
-
-/* Error bar - fluido */
-.error-bar {
-  background: #fee2e2;
-  color: var(--danger);
-  border: 1px solid #fecaca;
-  padding: var(--sp-sm) var(--sp-md);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--sp-md);
-  font-weight: 600;
-  font-size: var(--fs-base);
-}
-
-/* Login - fluido */
 .checking {
   display: grid;
   place-items: center;
-  height: 100vh;
-  color: var(--muted);
-  font-size: var(--fs-lg);
+  height: 100dvh;
+  color: var(--ink-3);
 }
 
-/* --mx/--my son seteadas por useParallax desde el componente.
-   Cero -> centro. -1..1 -> esquinas. Usadas por los orbes ::before/::after. */
-.login-wrap {
-  --mx: 0;
-  --my: 0;
-  min-height: 100vh;
+/* La navegación inferior solo existe en móvil; en escritorio manda la lateral. */
+.bottom-nav { display: none; }
+
+/* ---------------- Barra lateral ---------------- */
+
+.sidebar {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 18px;
+  padding: 12px 10px;
+  background: var(--sidebar);
+  border-right: 0.5px solid var(--line);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  overflow-y: auto;
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .sidebar { background: var(--sidebar-solid); }
+}
+
+.brand {
+  display: flex;
   align-items: center;
-  gap: var(--sp-xl);
-  background: linear-gradient(135deg, #1e3a8a, #2563eb);
-  padding: var(--sp-lg);
-  position: relative;
+  gap: 9px;
+  padding: 6px 6px 0;
+}
+.brand .logo {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  color: #fff;
+  background: linear-gradient(180deg, var(--accent), var(--accent-press));
+  border-radius: 7px;
+  box-shadow: var(--shadow-control);
+}
+.brand h1 {
+  font-size: 13px;
+  font-weight: 590;
+  letter-spacing: -0.008em;
+  line-height: 1.2;
+}
+.brand p {
+  margin: 0;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.nav-title {
+  padding: 0 6px 4px;
+  font-size: 11px;
+  font-weight: 590;
+  color: var(--ink-3);
+}
+.sidebar nav button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 7px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 450;
+  color: var(--ink-2);
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 110ms var(--ease), color 110ms var(--ease);
+}
+.sidebar nav button .icon { color: var(--ink-3); }
+.sidebar nav button:hover { background: var(--line); color: var(--ink); }
+.sidebar nav button:hover .icon { color: var(--ink-2); }
+.sidebar nav button.nav-on {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 510;
+}
+.sidebar nav button.nav-on .icon { color: var(--accent-ink); }
+
+/* Contador de la barra lateral: informa, no alarma. El rojo se reserva
+   para lo que exige acción del administrador (tickets pendientes). */
+.dot {
+  margin-left: auto;
+  min-width: 18px;
+  padding: 0 5px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  line-height: 16px;
+  text-align: center;
+  color: var(--ink-2);
+  background: var(--line);
+  border-radius: var(--r-pill);
+}
+.dot--alerta { color: #fff; background: var(--red); }
+.nav-on .dot { color: var(--accent-ink); background: rgba(0, 0, 0, 0.22); }
+
+.sidebar-foot { margin-top: auto; }
+.user-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 6px 3px;
+  border-top: 0.5px solid var(--line);
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  font-size: 11px;
+  font-weight: 590;
+  color: var(--ink-2);
+  background: var(--panel);
+  border: 0.5px solid var(--line);
+  border-radius: 50%;
+}
+.user-info { min-width: 0; }
+.user-info strong {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 510;
+  line-height: 1.25;
+  color: var(--ink);
   overflow: hidden;
-  isolation: isolate;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.user-info span {
+  display: block;
+  font-size: 11px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.user-box .icon-btn { margin-left: auto; }
+
+/* ---------------- Área de contenido ---------------- */
+
+.content-area {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  /* Permite que la columna se encoja por debajo de su contenido para que
+     `main` (overflow: auto) tome el desbordamiento y scrollee. */
+  min-height: 0;
+  background: var(--panel);
 }
 
-.login-wrap::before,
-.login-wrap::after {
-  content: '';
+/* Barra de título: nombre de la vista + acción primaria. */
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: none;
+  padding: 12px 20px;
+  /* Alineado con la columna máxima del contenido (ver `main`). */
+  padding-inline: max(20px, (100% - 1440px) / 2);
+  background: var(--panel);
+  border-bottom: 0.5px solid var(--line);
+}
+.titlebar h2 { font-size: 15px; line-height: 1.25; }
+.titlebar p {
+  margin: 1px 0 0;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.titlebar-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+main {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px 20px 24px;
+  /* En monitores anchos el contenido se centra en una columna máxima en vez de
+     estirarse: filas de tabla demasiado largas cuestan de seguir con la vista. */
+  padding-inline: max(20px, (100% - 1440px) / 2);
+  background: var(--bg);
+}
+
+/* Barra de herramientas de cada vista. */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+/* El título de la sección empuja el resto de la barra hacia la derecha. */
+.toolbar .admin-h3 { font-size: 14px; margin-right: auto; }
+/* Los campos ocupan el 100% dentro de un formulario; en la barra de
+   herramientas se ajustan a su contenido. */
+.toolbar > select,
+.toolbar > input { width: auto; min-width: 160px; }
+
+/* Campo de búsqueda con icono embebido. */
+.search-field { position: relative; display: flex; align-items: center; }
+.search-field .icon {
   position: absolute;
-  inset: -20%;
-  z-index: -1;
+  left: 8px;
+  color: var(--ink-3);
   pointer-events: none;
-  background-repeat: no-repeat;
-  filter: blur(60px);
-  opacity: 0.6;
-  will-change: transform;
-  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.search-field input {
+  width: 240px;
+  padding-left: 28px;
+}
+.search-field input[type='search']::-webkit-search-cancel-button { cursor: pointer; }
+
+.toolbar-count {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
 }
 
-.login-wrap::before {
-  transform: translate3d(calc(var(--mx) * 50px), calc(var(--my) * 40px), 0)
-             scale(1.05);
+/* Aviso de error: banda discreta, no un bloque de alarma. */
+.error-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  padding: 8px 20px;
+  font-size: 12.5px;
+  color: var(--red-ink);
+  background: var(--red-soft);
+  border-bottom: 0.5px solid var(--line);
 }
 
-.login-wrap::after {
-  opacity: 0.45;
-  transform: translate3d(calc(var(--mx) * -70px), calc(var(--my) * -55px), 0)
-             scale(1.1);
-  transition-duration: 900ms;
+/* ---------------- Login ---------------- */
+
+.login-wrap {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  min-height: 100dvh;
+  padding: 24px;
+  background:
+    radial-gradient(60rem 40rem at 50% -10%, var(--accent-soft), transparent 70%),
+    var(--bg);
+}
+.login-wrap--tienda {
+  background:
+    radial-gradient(60rem 40rem at 50% -10%, var(--violet-soft), transparent 70%),
+    var(--bg);
+}
+.login-wrap--area {
+  background:
+    radial-gradient(60rem 40rem at 50% -10%, var(--teal-soft), transparent 70%),
+    var(--bg);
 }
 
-/* El gradiente base se mantiene estático; el parallax lo dan los orbes ::before/::after.
-   Antes transicionaba background-position y eso repintaba toda el área en cada
-   movimiento de mouse, robando frames a otras animaciones. */
+.login-picker { text-align: center; }
+.login-picker-title { font-size: 24px; letter-spacing: -0.02em; }
+.login-picker-sub {
+  margin: 4px 0 26px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+.login-picker-cards {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
 
-@media (prefers-reduced-motion: reduce) {
-  .login-wrap::before,
-  .login-wrap::after { transform: none; transition: none; }
+/* Tarjeta de selección: superficie elevada, no un botón hinchado. */
+.login-card-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 232px;
+  padding: 26px 20px 22px;
+  font: inherit;
+  color: var(--ink);
+  text-align: center;
+  background: var(--panel);
+  border: 0.5px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow-panel);
+  cursor: pointer;
+  transition: transform 180ms var(--ease), box-shadow 180ms var(--ease);
+}
+.login-card-pick:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-pop);
+}
+.login-card-pick:active { transform: translateY(0); }
+.login-card-pick-icon { margin-bottom: 10px; color: var(--accent); }
+.login-card-pick--tienda .login-card-pick-icon { color: var(--violet); }
+.login-card-pick--area .login-card-pick-icon { color: var(--teal); }
+.login-card-pick-title { font-size: 14px; font-weight: 590; }
+.login-card-pick-desc {
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.4;
+  max-width: 22ch;
 }
 
 .login-card {
-  background: #fff;
-  width: 100%;
-  max-width: clamp(20rem, 80vw, 23.75rem);
-  border-radius: var(--radius-xl);
-  padding: clamp(1.5rem, 5vw, 2.25rem) clamp(1.25rem, 4vw, 1.875rem);
-  box-shadow: var(--shadow-lg);
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-md);
+  gap: 12px;
+  width: min(360px, 100%);
+  padding: 26px 26px 24px;
+  background: var(--panel);
+  border: 0.5px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow-pop);
 }
-
-.login-logo {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.login-logo svg {
-  filter: drop-shadow(0 4px 12px rgba(15, 23, 42, 0.12));
-}
-
-.login-card h1 {
-  margin: 0;
-  text-align: center;
-  font-size: var(--fs-xl);
-}
-
+.login-card h1 { font-size: 19px; text-align: center; }
 .login-sub {
-  margin: 0 0 var(--sp-sm);
-  text-align: center;
-  color: var(--muted);
-  font-size: var(--fs-base);
-}
-
-.login-card label {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-xs);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.login-card input {
-  width: 100%;
-}
-
-.login-btn {
-  margin-top: var(--sp-sm);
-  padding: var(--sp-md);
-  font-size: var(--fs-md);
-}
-
-.login-error {
-  background: #fee2e2;
-  color: var(--danger);
-  border: 1px solid #fecaca;
-  padding: var(--sp-sm) var(--sp-md);
-  border-radius: var(--radius-md);
-  font-size: var(--fs-base);
-  font-weight: 600;
+  margin: -8px 0 4px;
+  font-size: 12.5px;
+  color: var(--ink-3);
   text-align: center;
 }
-
-/* --- Selector inicial (Administración / Tiendas) --- */
-.login-wrap--picker {
-  background:
-    linear-gradient(135deg, #0f172a, #1e3a8a 35%, #1e40af 55%, #047857 90%);
-  background-size: 220% 220%;
-}
-
-.login-wrap--picker::before {
-  background:
-    radial-gradient(35% 45% at 20% 30%, rgba(96, 165, 250, 0.65), transparent 70%),
-    radial-gradient(30% 40% at 80% 70%, rgba(52, 211, 153, 0.55), transparent 70%);
-}
-
-.login-wrap--picker::after {
-  background:
-    radial-gradient(40% 50% at 75% 20%, rgba(167, 139, 250, 0.45), transparent 70%),
-    radial-gradient(35% 40% at 25% 85%, rgba(110, 231, 183, 0.45), transparent 70%);
-}
-
-.login-wrap--admin {
-  background: linear-gradient(135deg, #1e3a8a, #2563eb 55%, #3b82f6);
-  background-size: 200% 200%;
-}
-
-.login-wrap--admin::before {
-  background:
-    radial-gradient(35% 45% at 25% 30%, rgba(147, 197, 253, 0.6), transparent 70%),
-    radial-gradient(30% 40% at 80% 75%, rgba(165, 180, 252, 0.55), transparent 70%);
-}
-
-.login-wrap--admin::after {
-  background:
-    radial-gradient(40% 50% at 75% 25%, rgba(199, 210, 254, 0.4), transparent 70%);
-}
-
-.login-wrap--tienda {
-  background: linear-gradient(135deg, #be185d, #ec4899 45%, #f9a8d4 90%);
-  background-size: 200% 200%;
-}
-
-.login-wrap--tienda::before {
-  background:
-    radial-gradient(35% 45% at 25% 30%, rgba(251, 207, 232, 0.65), transparent 70%),
-    radial-gradient(30% 40% at 80% 75%, rgba(254, 205, 211, 0.55), transparent 70%);
-}
-
-.login-wrap--tienda::after {
-  background:
-    radial-gradient(40% 50% at 75% 25%, rgba(253, 186, 116, 0.4), transparent 70%),
-    radial-gradient(30% 40% at 20% 80%, rgba(216, 180, 254, 0.45), transparent 70%);
-}
-
-.login-picker {
-  width: 100%;
-  max-width: 44rem;
-  text-align: center;
-  color: #fff;
-}
-
-.login-picker-title {
-  margin: 0 0 var(--sp-xs);
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  font-weight: 700;
-}
-
-.login-picker-sub {
-  margin: 0 0 var(--sp-lg);
-  opacity: 0.85;
-  font-size: var(--fs-base);
-}
-
-.login-picker-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: var(--sp-md);
-}
-
-.login-card-pick {
-  background: rgba(255, 255, 255, 0.95);
-  border: 2px solid transparent;
-  border-radius: var(--radius-xl);
-  padding: var(--sp-lg);
-  cursor: pointer;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-xs);
-  box-shadow: var(--shadow-lg);
-  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.login-card-pick:hover {
-  transform: translateY(-3px);
-}
-
-.login-card-pick--admin:hover {
-  border-color: #2563eb;
-}
-
-.login-card-pick-icon {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: var(--sp-xs);
-}
-
-.login-card-pick-icon svg {
-  filter: drop-shadow(0 2px 6px rgba(15, 23, 42, 0.08));
-  transition: transform 0.2s ease;
-}
-
-.login-card-pick:hover .login-card-pick-icon svg {
-  transform: scale(1.05);
-}
-
-.login-card-pick-title {
-  font-size: var(--fs-lg);
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.login-card-pick-desc {
-  font-size: var(--fs-sm);
-  color: var(--muted);
-}
+.login-logo { display: grid; place-items: center; color: var(--accent); }
+.login-card--tienda .login-logo { color: var(--violet); }
+.login-card--area .login-logo { color: var(--teal); }
 
 .login-back {
-  align-self: flex-start;
-  background: transparent;
-  border: none;
-  color: var(--muted);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  margin-bottom: calc(-1 * var(--sp-sm));
-}
-
-.login-back:hover {
-  color: #0f172a;
-  text-decoration: underline;
-}
-
-.login-card--tienda .login-btn {
-  background: #ec4899;
-  border-color: #ec4899;
-}
-
-.login-card--tienda .login-btn:hover:not(:disabled) {
-  background: #db2777;
-  border-color: #db2777;
-}
-
-.login-card-pick--tienda:hover {
-  border-color: #ec4899;
-}
-
-/* --- Carrusel de tiendas (debajo del login Tiendas) --- */
-.tienda-carrusel {
-  position: relative;
-  margin-top: var(--sp-xl);
-  width: 100%;
-  max-width: 28rem;
-  overflow: hidden;
-  /* Aisla layout/paint para que no propague repaints. */
-  contain: layout paint;
-}
-
-/* Fade en los bordes con pseudo-elements sólidos en lugar de mask-image
-   (mask repinta el alpha por frame, esto solo compone una vez). */
-.tienda-carrusel::before,
-.tienda-carrusel::after {
-  content: '';
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 14%;
-  pointer-events: none;
-  z-index: 2;
+  top: 14px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 6px;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--accent);
+  background: none;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.login-back:hover { background: var(--accent-soft); }
+/* Cada portal mantiene su color: el azul no aparece dentro de otro portal. */
+.login-card--tienda .login-back { color: var(--violet); }
+.login-card--tienda .login-back:hover { background: var(--violet-soft); }
+.login-card--tienda input:focus-visible,
+.login-card--tienda .pass-field input:focus-visible {
+  border-color: var(--violet);
+  box-shadow: 0 0 0 3.5px var(--violet-soft);
+}
+.login-card--area .login-back { color: var(--teal); }
+.login-card--area .login-back:hover { background: var(--teal-soft); }
+.login-card--area input:focus-visible,
+.login-card--area .pass-field input:focus-visible {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3.5px var(--teal-soft);
 }
 
-.tienda-carrusel::before {
-  left: 0;
-  background: linear-gradient(90deg, #e0398a, rgba(224, 57, 138, 0));
+.login-btn { width: 100%; margin-top: 4px; min-height: 32px; }
+.login-card--tienda .login-btn { background: var(--violet); }
+.login-card--tienda .login-btn:hover { background: var(--violet); filter: brightness(0.94); }
+.login-card--area .login-btn { background: var(--teal); }
+.login-card--area .login-btn:hover { background: var(--teal); filter: brightness(0.94); }
+
+.login-error {
+  padding: 8px 10px;
+  font-size: 12.5px;
+  color: var(--red-ink);
+  background: var(--red-soft);
+  border-radius: var(--r-control);
 }
 
-.tienda-carrusel::after {
-  right: 0;
-  background: linear-gradient(270deg, #e0398a, rgba(224, 57, 138, 0));
+/* Carrusel de logos: decorativo; se detiene si se pide reducir el movimiento. */
+.tienda-carrusel {
+  width: min(560px, 90vw);
+  margin-top: 26px;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
 }
-
 .tienda-carrusel-track {
   display: flex;
+  gap: 16px;
   width: max-content;
-  animation: tienda-scroll 36s linear infinite;
-  /* translate3d en los keyframes ya promueve la capa automáticamente.
-     Evitamos will-change permanente para no inflar el layer. */
+  animation: carrusel 32s linear infinite;
 }
-
-.tienda-carrusel:hover .tienda-carrusel-track {
-  animation-play-state: paused;
+@keyframes carrusel {
+  to { transform: translateX(-50%); }
 }
-
-@keyframes tienda-scroll {
-  from { transform: translate3d(0, 0, 0); }
-  to   { transform: translate3d(-50%, 0, 0); }
-}
-
-.tienda-logo {
-  width: 60px;
-  height: 60px;
-  /* margin-right en TODOS los items (incluido el último) para que el ancho
-     total sea múltiplo exacto y translate(-50%) cierre el loop sin saltos. */
-  margin-right: var(--sp-md);
-  border-radius: 50%;
-  background: #fff;
-  padding: 4px;
-  box-shadow: var(--shadow-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.tienda-logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 50%;
-}
-
-.tienda-logo--placeholder {
-  background: #fce7f3;
-}
-
-.tienda-logo--placeholder span {
-  font-weight: 700;
-  color: #db2777;
-  font-size: 1.25rem;
-  text-transform: uppercase;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .tienda-carrusel-track { animation: none; }
+}
+.tienda-logo {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: none;
+  background: var(--panel);
+  border: 0.5px solid var(--line);
+  border-radius: 50%;
+  box-shadow: var(--shadow-control);
+  overflow: hidden;
+}
+.tienda-logo img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.tienda-logo--placeholder {
+  font-size: 15px;
+  font-weight: 590;
+  color: var(--ink-3);
 }

@@ -1,4 +1,5 @@
 import IconoAdmin from './icons/IconoAdmin';
+import IconoArea from './icons/IconoArea';
 import IconoTienda from './icons/IconoTienda';
 
 // Configuración declarativa de cada sección del login. El picker la recorre
@@ -15,6 +16,13 @@ export const SECCIONES = {
     subtitulo: 'Acceso del equipo de almacén',
     Icono: IconoAdmin,
     descripcion: '',
+  },
+  area: {
+    key: 'area',
+    titulo: 'Áreas',
+    subtitulo: 'Portal de líderes de área',
+    Icono: IconoArea,
+    descripcion: 'Solicita productos para tu área (RR.HH, Marketing, Logística).',
   },
   tienda: {
     key: 'tienda',
