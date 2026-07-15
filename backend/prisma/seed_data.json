@@ -504,7 +504,7 @@
     "stockMinimo": 1
   },
   {
-    "categoria": "Bonificaicones",
+    "categoria": "Bonificaciones",
     "producto": "Bolsas Chirimoya",
     "unidad": "Unidad",
     "stockCompleto": 55,
@@ -512,7 +512,7 @@
     "stockMinimo": 0
   },
   {
-    "categoria": "Bonificaicones",
+    "categoria": "Bonificaciones",
     "producto": "Bolsas Moradas",
     "unidad": "Unidad",
     "stockCompleto": 10,
@@ -520,7 +520,7 @@
     "stockMinimo": 0
   },
   {
-    "categoria": "Bonificaicones",
+    "categoria": "Bonificaciones",
     "producto": "Polos Bonificación",
     "unidad": "Unidad",
     "stockCompleto": 21,
@@ -528,7 +528,7 @@
     "stockMinimo": 0
   },
   {
-    "categoria": "Bonificaicones",
+    "categoria": "Bonificaciones",
     "producto": "Regalos de Proveedores (Polos)",
     "unidad": "Unidad",
     "stockCompleto": 21,
@@ -536,7 +536,7 @@
     "stockMinimo": 0
   },
   {
-    "categoria": "Bonificaicones",
+    "categoria": "Bonificaciones",
     "producto": "Regalos de Proveedores (Llaveros)",
     "unidad": "Unidad",
     "stockCompleto": 9,
@@ -544,7 +544,7 @@
     "stockMinimo": 0
   },
   {
-    "categoria": "Bonificaicones",
+    "categoria": "Bonificaciones",
     "producto": "Bolsos Argani",
     "unidad": "Unidad",
     "stockCompleto": 71,
@@ -552,7 +552,7 @@
     "stockMinimo": 0
   },
   {
-    "categoria": "Bonificaicones",
+    "categoria": "Bonificaciones",
     "producto": "Tomatodo Azul",
     "unidad": "Unidad",
     "stockCompleto": 1,

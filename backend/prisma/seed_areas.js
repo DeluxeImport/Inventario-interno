@@ -8,6 +8,7 @@ const LIDERES = [
   { username: 'rrhh', nombre: 'Líder RR.HH', area: 'RR.HH' },
   { username: 'marketing', nombre: 'Líder Marketing', area: 'Marketing' },
   { username: 'logistica', nombre: 'Líder Logística', area: 'Logística' },
+  { username: 'sistemas', nombre: 'Líder Sistemas', area: 'Sistemas' },
 ];
 
 async function main() {
