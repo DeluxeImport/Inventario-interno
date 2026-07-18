@@ -47,7 +47,7 @@ model Usuario {
   passwordHash       String
   rol                String      @default("usuario") // admin | usuario | tienda | lider
   tienda             String? // nombre de la tienda (para usuarios rol "tienda")
-  area               String? // área (para usuarios rol "lider": RR.HH | Marketing | Logística)
+  area               String? // área (para usuarios rol "lider": RR.HH | Marketing | Logística | Sistemas)
   activo             Boolean     @default(true)
   ultimoLogin        DateTime?
   ultimaIp           String?

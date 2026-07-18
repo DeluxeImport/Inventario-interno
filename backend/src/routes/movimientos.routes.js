@@ -4,9 +4,12 @@ import { auth, soloAlmacen } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { movimientoSchema } from '../validators/schemas.js';
 import { getIp } from '../utils/index.js';
-import { MOV_TIPOS } from '../constants/index.js';
+import { MOV_TIPOS, STOCK_ESTADOS } from '../constants/index.js';
+import { notificarWhatsapp } from '../lib/whatsapp.js';
 import * as movimientos from '../services/movimiento.service.js';
 import * as actividad from '../services/actividad.service.js';
+
+const ESTADO_LABEL = { [STOCK_ESTADOS.BAJO]: 'stock bajo', [STOCK_ESTADOS.AGOTADO]: 'agotado' };
 
 const router = Router();
 router.use(auth, soloAlmacen);
@@ -29,6 +32,12 @@ router.post(
       `${result.producto.producto}: ${result.mov.cantidad}`,
       getIp(req)
     );
+    if (result.alertaStock) {
+      notificarWhatsapp(
+        `⚠️ ${result.producto.producto} quedó en ${ESTADO_LABEL[result.producto.estado]} ` +
+          `(total: ${result.producto.stockTotal}, mínimo: ${result.producto.stockMinimo}).`
+      );
+    }
     res.status(201).json(result);
   })
 );

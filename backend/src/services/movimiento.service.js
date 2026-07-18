@@ -1,7 +1,7 @@
 import { prisma } from '../lib/prisma.js';
 import { withEstado, clampLimit } from '../utils/index.js';
 import { notFound, badRequest } from '../lib/AppError.js';
-import { MOV_TIPOS } from '../constants/index.js';
+import { MOV_TIPOS, STOCK_ESTADOS } from '../constants/index.js';
 
 // Lista paginada por cursor (id descendente ≈ más reciente primero). `cursor` = id del
 // último movimiento ya cargado; devuelve la página siguiente (más antiguos).
@@ -54,7 +54,14 @@ export async function registrar(data, responsablePorDefecto) {
         observacion: observacion?.trim() || null,
       },
     });
-    return { mov, producto: withEstado(updated) };
+    const producto = withEstado(updated);
+    // Alerta solo cuando el movimiento EMPEORA el estado (evita avisar de nuevo
+    // si el producto ya estaba en stock bajo). La notificación la dispara la ruta.
+    const estadoAntes = withEstado(prod).estado;
+    const alertaStock =
+      (estadoAntes === STOCK_ESTADOS.OK && producto.estado !== STOCK_ESTADOS.OK) ||
+      (estadoAntes === STOCK_ESTADOS.BAJO && producto.estado === STOCK_ESTADOS.AGOTADO);
+    return { mov, producto, alertaStock };
   });
 }
 

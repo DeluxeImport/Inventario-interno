@@ -12,6 +12,9 @@ const schema = z.object({
     ),
   JWT_EXPIRES_IN: z.string().default('12h'),
   CORS_ORIGIN: z.string().optional(),
+  // Notificaciones por WhatsApp vía CallMeBot (opcional). Si faltan, se desactiva.
+  CALLMEBOT_PHONE: z.string().optional(),
+  CALLMEBOT_APIKEY: z.string().optional(),
 });
 
 const parseCorsOrigins = (value) =>
@@ -37,5 +40,10 @@ export function buildConfig(env = process.env) {
     jwtSecret: parsed.data.JWT_SECRET,
     jwtExpiresIn: parsed.data.JWT_EXPIRES_IN,
     corsOrigin: corsOrigins.length > 0 ? corsOrigins : true,
+    whatsapp: {
+      enabled: Boolean(parsed.data.CALLMEBOT_PHONE && parsed.data.CALLMEBOT_APIKEY),
+      phone: parsed.data.CALLMEBOT_PHONE || null,
+      apikey: parsed.data.CALLMEBOT_APIKEY || null,
+    },
   };
 }
