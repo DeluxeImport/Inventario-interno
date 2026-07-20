@@ -9,6 +9,23 @@ export const clearToken = () => localStorage.removeItem(TOKEN_KEY);
 let onUnauthorized = () => {};
 export const setOnUnauthorized = (fn) => (onUnauthorized = fn);
 
+// Compatibilidad durante despliegues escalonados: la API anterior devolvía un arreglo,
+// mientras que la API paginada devuelve { items, nextCursor, hasMore, total }.
+// Normalizar aquí evita que una versión antigua del backend derribe toda la interfaz.
+const normalizePage = (data) => {
+  if (Array.isArray(data)) {
+    return { items: data, nextCursor: null, hasMore: false, total: data.length };
+  }
+  const items = Array.isArray(data?.items) ? data.items : [];
+  return {
+    ...data,
+    items,
+    nextCursor: data?.nextCursor || null,
+    hasMore: Boolean(data?.hasMore),
+    total: Number.isFinite(data?.total) ? data.total : items.length,
+  };
+};
+
 async function req(path, opts = {}) {
   const token = getToken();
   const res = await fetch(BASE + path, {
@@ -60,8 +77,11 @@ export const api = {
   actividades: (usuarioId) => req(`/actividades${usuarioId ? `?usuarioId=${usuarioId}` : ''}`),
 
   // Productos
-  productos: (q = '', categoria = 'Todas') =>
-    req(`/productos?q=${encodeURIComponent(q)}&categoria=${encodeURIComponent(categoria)}`),
+  productos: ({ q = '', categoria = 'Todas', cursor, limit = 50 } = {}) => {
+    const qs = new URLSearchParams({ q, categoria, limit: String(limit) });
+    if (cursor) qs.set('cursor', cursor);
+    return req(`/productos?${qs}`).then(normalizePage);
+  },
   categorias: () => req('/categorias'),
   stats: () => req('/stats'),
   destinos: () => req('/destinos'),
@@ -69,11 +89,14 @@ export const api = {
   editarProducto: (id, data) => req(`/productos/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   borrarProducto: (id) => req(`/productos/${id}`, { method: 'DELETE' }),
 
-  // Movimientos (paginado por cursor: `cursor` = id del último movimiento ya cargado)
-  movimientos: (productoId, { cursor } = {}) => {
+  // Movimientos (paginado por cursor + filtros opcionales: desde, hasta, tipo, productoId)
+  movimientos: ({ productoId, cursor, desde, hasta, tipo } = {}) => {
     const qs = new URLSearchParams();
     if (productoId) qs.set('productoId', productoId);
     if (cursor) qs.set('cursor', cursor);
+    if (desde) qs.set('desde', desde);
+    if (hasta) qs.set('hasta', hasta);
+    if (tipo) qs.set('tipo', tipo);
     const s = qs.toString();
     return req(`/movimientos${s ? `?${s}` : ''}`);
   },
@@ -82,7 +105,12 @@ export const api = {
 
   // Tickets / solicitudes
   solicitables: () => req('/solicitables'),
-  tickets: (estado) => req(`/tickets${estado && estado !== 'TODOS' ? `?estado=${estado}` : ''}`),
+  tickets: (estado, cursor, limit = 40) => {
+    const qs = new URLSearchParams({ limit: String(limit) });
+    if (estado && estado !== 'TODOS') qs.set('estado', estado);
+    if (cursor) qs.set('cursor', cursor);
+    return req(`/tickets?${qs}`).then(normalizePage);
+  },
   crearTicket: (data) => req('/tickets', { method: 'POST', body: JSON.stringify(data) }),
   accionTicket: (id, accion, data = {}) =>
     req(`/tickets/${id}/estado`, {

@@ -3,10 +3,31 @@ import { withEstado, clampLimit } from '../utils/index.js';
 import { notFound, badRequest } from '../lib/AppError.js';
 import { MOV_TIPOS } from '../constants/index.js';
 
+const parseFecha = (valor) => {
+  if (!valor) return null;
+  const fecha = new Date(`${valor}T00:00:00`);
+  return Number.isNaN(fecha.getTime()) ? null : fecha;
+};
+
 // Lista paginada por cursor (id descendente ≈ más reciente primero). `cursor` = id del
 // último movimiento ya cargado; devuelve la página siguiente (más antiguos).
-export function listar({ productoId, limit, cursor } = {}) {
-  const where = productoId ? { productoId: Number(productoId) } : {};
+export function listar({ productoId, limit, cursor, desde, hasta, tipo } = {}) {
+  const where = {};
+  if (productoId) where.productoId = Number(productoId);
+  if (tipo === MOV_TIPOS.ENTRADA || tipo === MOV_TIPOS.SALIDA) where.tipo = tipo;
+
+  const fechaDesde = parseFecha(desde);
+  const fechaHasta = parseFecha(hasta);
+  if (fechaDesde || fechaHasta) {
+    where.fecha = {};
+    if (fechaDesde) where.fecha.gte = fechaDesde;
+    if (fechaHasta) {
+      const finDelRango = new Date(fechaHasta);
+      finDelRango.setDate(finDelRango.getDate() + 1);
+      where.fecha.lt = finDelRango;
+    }
+  }
+
   const take = clampLimit(limit, 100, 200);
   return prisma.movimiento.findMany({
     where,

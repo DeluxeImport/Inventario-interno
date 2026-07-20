@@ -82,7 +82,7 @@ export default function App() {
     if (user && puede(user.rol, 'dashboard')) api.stats().then(setStats).catch(() => {});
     api
       .tickets('PENDIENTE')
-      .then((t) => setTicketsPend(t.length))
+      .then((page) => setTicketsPend(page.total ?? page.items.length))
       .catch(() => {});
     setRefreshKey((k) => k + 1);
   }, [user]);
@@ -158,7 +158,7 @@ export default function App() {
             <Admin currentUser={user} onError={onError} />
           )}
           {activeView === 'actualizaciones' && <Actualizaciones />}
-          {activeView === 'manual' && <Manual />}
+          {activeView === 'manual' && <Manual user={user} />}
         </main>
       </div>
 

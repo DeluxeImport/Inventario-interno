@@ -15,6 +15,9 @@ const PRODUCTO_VACIO = {
   solicitable: false,
 };
 
+const PAGE_SIZE = 50;
+
+
 // Clase de la fila según la gravedad del estado: agotado pesa más que stock bajo.
 const claseFila = (estado) => {
   if (estado === 'AGOTADO') return 'row-alert row-alert--critica';
@@ -27,19 +30,42 @@ export default function Inventario({ categorias, onChanged, onError }) {
   const [q, setQ] = useState('');
   const [cat, setCat] = useState('Todas');
   const [loading, setLoading] = useState(true);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [editing, setEditing] = useState(null);
   const [movFor, setMovFor] = useState(null);
 
   const cargar = useCallback(async () => {
     setLoading(true);
     try {
-      setProductos(await api.productos(q, cat));
+      const page = await api.productos({ q, categoria: cat, limit: PAGE_SIZE });
+      setProductos(page.items);
+      setNextCursor(page.nextCursor);
     } catch (e) {
       onError(e.message);
     } finally {
       setLoading(false);
     }
   }, [q, cat, onError]);
+
+  const cargarMas = async () => {
+    if (!nextCursor || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const page = await api.productos({
+        q,
+        categoria: cat,
+        cursor: nextCursor,
+        limit: PAGE_SIZE,
+      });
+      setProductos((actuales) => [...actuales, ...page.items]);
+      setNextCursor(page.nextCursor);
+    } catch (e) {
+      onError(e.message);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   useEffect(() => {
     const t = setTimeout(cargar, 200);
@@ -87,7 +113,7 @@ export default function Inventario({ categorias, onChanged, onError }) {
         </button>
         {!loading && (
           <span className="toolbar-count">
-            {productos.length === 1 ? '1 producto' : `${productos.length} productos`}
+            {productos.length === 1 ? '1 producto cargado' : `${productos.length} productos cargados`}
           </span>
         )}
       </div>
@@ -162,6 +188,13 @@ export default function Inventario({ categorias, onChanged, onError }) {
               )}
             </tbody>
           </table>
+          {nextCursor && (
+            <div className="center" style={{ padding: '12px' }}>
+              <button className="btn btn-sm" onClick={cargarMas} disabled={loadingMore}>
+                {loadingMore ? 'Cargando…' : 'Cargar más'}
+              </button>
+            </div>
+          )}
         </div>
       )}
 

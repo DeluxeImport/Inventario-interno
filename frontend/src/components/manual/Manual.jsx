@@ -1,7 +1,10 @@
 import Icon from '../common/Icon';
+import { esSolicitante } from '../../constants';
 
-// El PDF se sirve como archivo estático desde `public/manual.pdf`.
+// El PDF completo se sirve desde `public/manual.pdf`; la guía visual para
+// solicitantes desde `public/guia-solicitud.png`.
 const PDF_URL = '/manual.pdf';
+const GUIA_URL = '/guia-solicitud.jpg';
 
 const CONTENIDO = [
   'Cómo iniciar sesión en cada portal (Administración, Áreas, Tiendas).',
@@ -12,7 +15,39 @@ const CONTENIDO = [
   'Administrar usuarios y consultar la bitácora.',
 ];
 
-export default function Manual() {
+// Manual según el rol: tiendas y áreas ven la guía visual para pedir; el equipo
+// de almacén y administración ve el manual completo en PDF.
+export default function Manual({ user }) {
+  return esSolicitante(user.rol) ? <GuiaSolicitud /> : <ManualPDF />;
+}
+
+// ---------- Tiendas y áreas: guía visual ----------
+function GuiaSolicitud() {
+  return (
+    <div className="manual">
+      <div className="manual-hero">
+        <span className="manual-hero-ico" aria-hidden="true">
+          <Icon name="libro" size={26} />
+        </span>
+        <div className="manual-hero-txt">
+          <h3>Cómo generar una solicitud</h3>
+          <p>Guía paso a paso para pedir productos al almacén.</p>
+        </div>
+        <a className="btn btn-primary manual-descargar" href={GUIA_URL} target="_blank" rel="noreferrer">
+          <Icon name="descarga" size={14} className="rot" />
+          Ver en grande
+        </a>
+      </div>
+
+      <div className="guia-imagen">
+        <img src={GUIA_URL} alt="Guía paso a paso para crear una nueva solicitud" />
+      </div>
+    </div>
+  );
+}
+
+// ---------- Almacén y administración: manual completo en PDF ----------
+function ManualPDF() {
   return (
     <div className="manual">
       <div className="manual-hero">
