@@ -16,6 +16,7 @@ model Producto {
   stockIncompleto Int          @default(0)
   stockMinimo     Int          @default(0)
   unidadesPorPaquete Int       @default(1) // cuántas unidades trae un paquete (para solicitudes por paquete)
+  precio          Float        @default(0) // precio unitario
   solicitable     Boolean      @default(false)
   movimientos     Movimiento[]
   ticketItems     TicketItem[]

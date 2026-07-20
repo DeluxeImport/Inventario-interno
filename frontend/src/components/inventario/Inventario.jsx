@@ -12,10 +12,13 @@ const PRODUCTO_VACIO = {
   stockCompleto: 0,
   stockIncompleto: 0,
   stockMinimo: 0,
+  precio: 0,
   solicitable: false,
 };
 
 const PAGE_SIZE = 50;
+
+const fmtPrecio = (valor) => `S/ ${(Number(valor) || 0).toFixed(2)}`;
 
 
 // Clase de la fila según la gravedad del estado: agotado pesa más que stock bajo.
@@ -128,6 +131,7 @@ export default function Inventario({ categorias, onChanged, onError }) {
                 <th>Producto</th>
                 <th>Categoría</th>
                 <th>Unidad de medida</th>
+                <th className="num">Precio</th>
                 <th className="num">Completo</th>
                 <th className="num">Incompleto</th>
                 <th className="num">Total</th>
@@ -149,6 +153,7 @@ export default function Inventario({ categorias, onChanged, onError }) {
                   </td>
                   <td data-label="Categoría">{p.categoria}</td>
                   <td data-label="Unidad">{p.unidad}</td>
+                  <td data-label="Precio" className="num">{fmtPrecio(p.precio)}</td>
                   <td data-label="Completo" className="num">{p.stockCompleto}</td>
                   <td data-label="Incompleto" className="num">{p.stockIncompleto}</td>
                   <td data-label="Total" className="num strong">{p.stockTotal}</td>
@@ -181,7 +186,7 @@ export default function Inventario({ categorias, onChanged, onError }) {
               ))}
               {productos.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="muted center">
+                  <td colSpan={10} className="muted center">
                     No hay productos que coincidan con la búsqueda.
                   </td>
                 </tr>

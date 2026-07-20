@@ -38,10 +38,23 @@ export default function ProductoModal({ producto, categorias, onClose, onSaved, 
             required
           />
         </label>
-        <label>
-          Producto
-          <input value={form.producto} onChange={(e) => set('producto', e.target.value)} required />
-        </label>
+        <div className="grid2">
+          <label>
+            Producto
+            <input value={form.producto} onChange={(e) => set('producto', e.target.value)} required />
+          </label>
+          <label>
+            Precio (S/)
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              inputMode="decimal"
+              value={form.precio}
+              onChange={(e) => set('precio', e.target.value)}
+            />
+          </label>
+        </div>
         <label>
           Unidad de medida
           <Combobox

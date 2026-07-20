@@ -130,8 +130,19 @@ test('productoCrearSchema: acepta stock cero y datos válidos', () => {
     producto: 'Lápiz',
     stockCompleto: 0,
     stockMinimo: 3,
+    precio: 2.5,
   });
   assert.equal(r.success, true);
+});
+
+test('productoCrearSchema: rechaza precio negativo', () => {
+  const r = productoCrearSchema.safeParse({
+    categoria: 'Papelería',
+    producto: 'Lápiz',
+    precio: -1,
+  });
+  assert.equal(r.success, false);
+  assert.match(r.error.issues[0].message, /precio no puede ser negativo/i);
 });
 
 test('usuarioCrearSchema: rechaza un rol inválido', () => {

@@ -18,6 +18,8 @@ const stockNoNegativo = z.coerce
   .int('El stock debe ser un número entero.')
   .min(0, 'El stock no puede ser negativo.');
 
+const precioNoNegativo = z.coerce.number().min(0, 'El precio no puede ser negativo.');
+
 // Rol válido contra la lista de roles permitidos (evita roles arbitrarios).
 const rolValido = z
   .string()
@@ -33,6 +35,7 @@ export const productoCrearSchema = z.object({
   stockCompleto: stockNoNegativo.optional(),
   stockIncompleto: stockNoNegativo.optional(),
   stockMinimo: stockNoNegativo.optional(),
+  precio: precioNoNegativo.optional(),
   solicitable: z.boolean().optional(),
 });
 
@@ -43,6 +46,7 @@ export const productoEditarSchema = z.object({
   stockCompleto: stockNoNegativo.optional(),
   stockIncompleto: stockNoNegativo.optional(),
   stockMinimo: stockNoNegativo.optional(),
+  precio: precioNoNegativo.optional(),
   solicitable: z.boolean().optional(),
 });
 

@@ -56,6 +56,7 @@ export async function crear(data) {
       stockCompleto: Number(data.stockCompleto) || 0,
       stockIncompleto: Number(data.stockIncompleto) || 0,
       stockMinimo: Number(data.stockMinimo) || 0,
+      precio: Number(data.precio) || 0,
       solicitable: !!data.solicitable,
     },
   });
@@ -72,6 +73,7 @@ export async function actualizar(id, data) {
       stockCompleto: data.stockCompleto != null ? Number(data.stockCompleto) : undefined,
       stockIncompleto: data.stockIncompleto != null ? Number(data.stockIncompleto) : undefined,
       stockMinimo: data.stockMinimo != null ? Number(data.stockMinimo) : undefined,
+      precio: data.precio != null ? Number(data.precio) : undefined,
       solicitable: data.solicitable != null ? !!data.solicitable : undefined,
     },
   });
