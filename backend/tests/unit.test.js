@@ -11,6 +11,7 @@ import {
 import { ROLES_LIST, STOCK_ESTADOS } from '../src/constants/index.js';
 import { buildConfig } from '../src/config/buildConfig.js';
 import { soloAlmacen } from '../src/middleware/auth.js';
+import { decodeCursor, encodeCursor, pageResult } from '../src/lib/pagination.js';
 import {
   productoCrearSchema,
   usuarioCrearSchema,
@@ -87,6 +88,26 @@ test('clampLimit: recorta al máximo y respeta valores válidos', () => {
   assert.equal(clampLimit('30', 100, 200), 30);
 });
 
+test('cursores: codifica y valida un cursor opaco', () => {
+  const value = { categoria: 'Cabello', producto: 'Shampoo', id: 42 };
+  const encoded = encodeCursor(value);
+  assert.deepEqual(
+    decodeCursor(encoded, (c) => Number.isInteger(c.id) && typeof c.producto === 'string'),
+    value
+  );
+});
+
+test('cursores: rechaza valores manipulados', () => {
+  assert.throws(() => decodeCursor('no-es-un-cursor', () => true), /Cursor de paginación inválido/);
+});
+
+test('pageResult: separa el registro centinela y genera el siguiente cursor', () => {
+  const page = pageResult([{ id: 1 }, { id: 2 }, { id: 3 }], 2, ({ id }) => ({ id }));
+  assert.deepEqual(page.items, [{ id: 1 }, { id: 2 }]);
+  assert.equal(page.hasMore, true);
+  assert.deepEqual(decodeCursor(page.nextCursor, (c) => Number.isInteger(c.id)), { id: 2 });
+});
+
 test('ROLES_LIST contiene los cuatro roles esperados', () => {
   assert.deepEqual([...ROLES_LIST].sort(), ['admin', 'lider', 'tienda', 'usuario']);
 });
@@ -109,8 +130,19 @@ test('productoCrearSchema: acepta stock cero y datos válidos', () => {
     producto: 'Lápiz',
     stockCompleto: 0,
     stockMinimo: 3,
+    precio: 2.5,
   });
   assert.equal(r.success, true);
+});
+
+test('productoCrearSchema: rechaza precio negativo', () => {
+  const r = productoCrearSchema.safeParse({
+    categoria: 'Papelería',
+    producto: 'Lápiz',
+    precio: -1,
+  });
+  assert.equal(r.success, false);
+  assert.match(r.error.issues[0].message, /precio no puede ser negativo/i);
 });
 
 test('usuarioCrearSchema: rechaza un rol inválido', () => {
@@ -187,6 +219,36 @@ test('buildConfig: normaliza lista de CORS_ORIGIN cuando está configurado', () 
     CORS_ORIGIN: 'https://a.com, https://b.com ',
   });
   assert.deepEqual(cfg.corsOrigin, ['https://a.com', 'https://b.com']);
+});
+
+test('buildConfig: WhatsApp queda desactivado si falta alguna credencial', () => {
+  const cfg = buildConfig({
+    DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
+    NODE_ENV: 'development',
+    JWT_SECRET: 'a'.repeat(32),
+    CALLMEBOT_PHONE: '+51987654321',
+  });
+  assert.deepEqual(cfg.whatsapp, {
+    enabled: false,
+    phone: '+51987654321',
+    apikey: null,
+  });
+});
+
+test('buildConfig: WhatsApp se activa con teléfono y API key', () => {
+  const cfg = buildConfig({
+    DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
+    NODE_ENV: 'production',
+    JWT_SECRET: 'a'.repeat(32),
+    CORS_ORIGIN: 'https://inventario.example.com',
+    CALLMEBOT_PHONE: ' +51987654321 ',
+    CALLMEBOT_APIKEY: ' 123456 ',
+  });
+  assert.deepEqual(cfg.whatsapp, {
+    enabled: true,
+    phone: '+51987654321',
+    apikey: '123456',
+  });
 });
 
 test('soloAlmacen: rechaza roles desconocidos en vez de heredarlos como almacén', () => {

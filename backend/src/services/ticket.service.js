@@ -1,7 +1,8 @@
 import { prisma } from '../lib/prisma.js';
-import { ticketPublico, codigoTicket, destinoDeSolicitante } from '../utils/index.js';
+import { ticketPublico, codigoTicket, destinoDeSolicitante, clampLimit } from '../utils/index.js';
 import { notFound, badRequest } from '../lib/AppError.js';
 import { ROLES, TICKET_ESTADOS, MOV_TIPOS } from '../constants/index.js';
+import { decodeCursor, pageResult } from '../lib/pagination.js';
 
 const includeTicket = {
   items: { include: { producto: true } },
@@ -10,17 +11,39 @@ const includeTicket = {
 };
 
 // El admin ve todos los tickets; los demás solo los suyos. Filtro opcional por estado.
-export async function listar(user, { estado } = {}) {
-  const where = {};
-  if (user.rol !== ROLES.ADMIN) where.solicitanteId = user.id;
-  if (estado && estado !== 'TODOS') where.estado = estado;
-  const tickets = await prisma.ticket.findMany({
-    where,
-    include: includeTicket,
-    orderBy: { createdAt: 'desc' },
-    take: 200,
-  });
-  return tickets.map(ticketPublico);
+const esCursorTicket = (c) =>
+  c && typeof c.createdAt === 'string' && !Number.isNaN(Date.parse(c.createdAt)) &&
+  Number.isInteger(c.id) && c.id > 0;
+
+export async function listar(user, { estado, limit, cursor } = {}) {
+  const filtros = [];
+  if (user.rol !== ROLES.ADMIN) filtros.push({ solicitanteId: user.id });
+  if (estado && estado !== 'TODOS') filtros.push({ estado });
+
+  const posicion = decodeCursor(cursor, esCursorTicket);
+  if (posicion) {
+    const createdAt = new Date(posicion.createdAt);
+    filtros.push({
+      OR: [{ createdAt: { lt: createdAt } }, { createdAt, id: { lt: posicion.id } }],
+    });
+  }
+
+  const pageSize = clampLimit(limit, 40, 100);
+  const where = filtros.length > 0 ? { AND: filtros } : undefined;
+  const [rows, total] = await Promise.all([
+    prisma.ticket.findMany({
+      where,
+      include: includeTicket,
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      take: pageSize + 1,
+    }),
+    cursor ? Promise.resolve(null) : prisma.ticket.count({ where }),
+  ]);
+  const page = pageResult(rows, pageSize, ({ createdAt, id }) => ({
+    createdAt: createdAt.toISOString(),
+    id,
+  }));
+  return { ...page, total, items: page.items.map(ticketPublico) };
 }
 
 export async function crear(user, { area, nota, items }) {

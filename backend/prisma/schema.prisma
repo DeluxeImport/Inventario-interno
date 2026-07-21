@@ -16,13 +16,15 @@ model Producto {
   stockIncompleto Int          @default(0)
   stockMinimo     Int          @default(0)
   unidadesPorPaquete Int       @default(1) // cuántas unidades trae un paquete (para solicitudes por paquete)
+  precio          Float        @default(0) // precio unitario
   solicitable     Boolean      @default(false)
   movimientos     Movimiento[]
   ticketItems     TicketItem[]
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
-  @@index([categoria])
+  // Listado paginado: filtro por categoría + orden estable por nombre/id.
+  @@index([categoria, producto, id])
 }
 
 model Movimiento {
@@ -36,8 +38,10 @@ model Movimiento {
   observacion String?
   fecha       DateTime @default(now())
 
-  @@index([productoId])
-  @@index([fecha])
+  // Historial filtrado por producto y fecha.
+  @@index([productoId, fecha, id])
+  @@index([fecha, id])
+  @@index([tipo, fecha, id])
 }
 
 model Usuario {
@@ -47,7 +51,7 @@ model Usuario {
   passwordHash       String
   rol                String      @default("usuario") // admin | usuario | tienda | lider
   tienda             String? // nombre de la tienda (para usuarios rol "tienda")
-  area               String? // área (para usuarios rol "lider": RR.HH | Marketing | Logística)
+  area               String? // área (para usuarios rol "lider": RR.HH | Marketing | Logística | Sistemas)
   activo             Boolean     @default(true)
   ultimoLogin        DateTime?
   ultimaIp           String?
@@ -66,8 +70,8 @@ model Actividad {
   ip        String?
   fecha     DateTime @default(now())
 
-  @@index([usuarioId])
-  @@index([fecha])
+  @@index([usuarioId, id])
+  @@index([fecha, id])
 }
 
 model Ticket {
@@ -85,9 +89,11 @@ model Ticket {
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
-  @@index([solicitanteId])
-  @@index([estado])
-  @@index([createdAt])
+  // Listados paginados del solicitante y de administración.
+  @@index([solicitanteId, createdAt, id])
+  @@index([solicitanteId, estado, createdAt, id])
+  @@index([estado, createdAt, id])
+  @@index([createdAt, id])
 }
 
 model TicketItem {

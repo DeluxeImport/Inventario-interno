@@ -3,7 +3,8 @@ import { asyncHandler } from '../lib/asyncHandler.js';
 import { auth, adminOnly, soloSolicitante } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { ticketCrearSchema, ticketEstadoSchema } from '../validators/schemas.js';
-import { getIp } from '../utils/index.js';
+import { getIp, codigoTicket } from '../utils/index.js';
+import { notificarWhatsapp } from '../lib/whatsapp.js';
 import * as tickets from '../services/ticket.service.js';
 import * as actividad from '../services/actividad.service.js';
 
@@ -28,6 +29,11 @@ router.post(
       `${ticket.codigo} (${ticket.items.length} producto/s)`,
       getIp(req)
     );
+    const origen =
+      ticket.solicitante?.tienda || ticket.solicitante?.area || ticket.solicitante?.nombre;
+    notificarWhatsapp(
+      `📩 Nueva solicitud ${ticket.codigo} de ${origen} (${ticket.items.length} producto/s).`
+    );
     res.status(201).json(ticket);
   })
 );
@@ -38,13 +44,25 @@ router.put(
   adminOnly,
   validate(ticketEstadoSchema),
   asyncHandler(async (req, res) => {
-    const { ticket, accionLog } = await tickets.cambiarEstado(
-      req.user,
-      Number(req.params.id),
-      req.body
+    const id = Number(req.params.id);
+    let result;
+    try {
+      result = await tickets.cambiarEstado(req.user, id, req.body);
+    } catch (error) {
+      if (/stock insuficiente/i.test(error.message)) {
+        notificarWhatsapp(
+          `⚠️ No se pudo entregar ${codigoTicket(id)}: ${error.message} Reponer stock.`
+        );
+      }
+      throw error;
+    }
+    await actividad.registrar(
+      req.user.id,
+      result.accionLog,
+      result.ticket.codigo,
+      getIp(req)
     );
-    await actividad.registrar(req.user.id, accionLog, ticket.codigo, getIp(req));
-    res.json(ticket);
+    res.json(result.ticket);
   })
 );
 

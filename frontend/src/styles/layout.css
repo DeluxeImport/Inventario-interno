@@ -226,6 +226,16 @@ main {
 .toolbar > select,
 .toolbar > input { width: auto; min-width: 160px; }
 
+/* Filtro con etiqueta en línea (ej. fechas de Movimientos). */
+.toolbar .filtro {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.toolbar .filtro input { width: auto; min-width: 0; }
+
 /* Campo de búsqueda con icono embebido. */
 .search-field { position: relative; display: flex; align-items: center; }
 .search-field .icon {
