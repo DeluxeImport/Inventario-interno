@@ -12,3 +12,7 @@ export function filterProducts(products, query) {
     normalizeSearch(`${product.producto} ${product.categoria}`).includes(normalizedQuery)
   );
 }
+
+// Las solicitudes se entregan desde stock completo; el stock incompleto no está
+// disponible para pedidos hasta que almacén lo regularice.
+export const hasRequestStock = (product) => Number(product?.stockCompleto) > 0;

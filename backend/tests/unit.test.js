@@ -7,6 +7,7 @@ import {
   getIp,
   destinoDeSolicitante,
   clampLimit,
+  tieneStockParaSolicitud,
 } from '../src/utils/index.js';
 import { ROLES_LIST, STOCK_ESTADOS } from '../src/constants/index.js';
 import { buildConfig } from '../src/config/buildConfig.js';
@@ -73,6 +74,12 @@ test('destinoDeSolicitante: prioriza tienda, luego área', () => {
   assert.equal(destinoDeSolicitante({ tienda: 'Nova', area: null }), 'Nova');
   assert.equal(destinoDeSolicitante({ tienda: null, area: 'Logística' }), 'Logística');
   assert.equal(destinoDeSolicitante({ tienda: null, area: null }), null);
+});
+
+test('solicitudes: solo permite productos con stock completo disponible', () => {
+  assert.equal(tieneStockParaSolicitud({ stockCompleto: 0, stockIncompleto: 5 }), false);
+  assert.equal(tieneStockParaSolicitud({ stockCompleto: -1 }), false);
+  assert.equal(tieneStockParaSolicitud({ stockCompleto: 1 }), true);
 });
 
 test('clampLimit: usa el valor por defecto ante entradas inválidas', () => {

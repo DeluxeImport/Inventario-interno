@@ -44,6 +44,10 @@ export const publicUser = (u) => ({
 export const destinoDeSolicitante = (solicitante) =>
   solicitante?.tienda || solicitante?.area || null;
 
+// Los tickets se despachan desde stock completo; un producto agotado no puede
+// entrar a una solicitud aunque siga marcado como solicitable.
+export const tieneStockParaSolicitud = (producto) => Number(producto?.stockCompleto) > 0;
+
 // Código legible del ticket derivado de su id (TK-0001).
 export const codigoTicket = (id) => 'TK-' + String(id).padStart(4, '0');
 

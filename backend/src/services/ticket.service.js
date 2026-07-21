@@ -1,5 +1,11 @@
 import { prisma } from '../lib/prisma.js';
-import { ticketPublico, codigoTicket, destinoDeSolicitante, clampLimit } from '../utils/index.js';
+import {
+  ticketPublico,
+  codigoTicket,
+  destinoDeSolicitante,
+  clampLimit,
+  tieneStockParaSolicitud,
+} from '../utils/index.js';
 import { notFound, badRequest } from '../lib/AppError.js';
 import { ROLES, TICKET_ESTADOS, MOV_TIPOS } from '../constants/index.js';
 import { decodeCursor, pageResult } from '../lib/pagination.js';
@@ -56,6 +62,9 @@ export async function crear(user, { area, nota, items }) {
   const prods = await prisma.producto.findMany({ where: { id: { in: ids } } });
   if (prods.length !== ids.length || prods.some((p) => !p.solicitable))
     throw badRequest('Uno de los productos no está habilitado para solicitudes.');
+  const agotado = prods.find((producto) => !tieneStockParaSolicitud(producto));
+  if (agotado)
+    throw badRequest(`"${agotado.producto}" está agotado y no puede agregarse a la solicitud.`);
 
   const ticket = await prisma.ticket.create({
     data: {

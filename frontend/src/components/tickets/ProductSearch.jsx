@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { filterProducts } from '../../lib/productSearch';
+import { filterProducts, hasRequestStock } from '../../lib/productSearch';
 import Icon from '../common/Icon';
 
 const MAX_SEARCH_RESULTS = 12;
@@ -42,25 +42,33 @@ export default function ProductSearch({ productos, productoId, onSelect }) {
                   : `${productosFiltrados.length} productos encontrados`}
               </p>
               <div className="product-search-list" role="listbox" aria-label="Productos encontrados">
-                {productosFiltrados.slice(0, MAX_SEARCH_RESULTS).map((producto) => (
-                  <button
-                    key={producto.id}
-                    type="button"
-                    className="product-search-option"
-                    role="option"
-                    aria-selected={producto.id === Number(productoId)}
-                    onClick={() => {
-                      onSelect(String(producto.id));
-                      setBusqueda('');
-                    }}
-                  >
-                    <span>
-                      <strong>{producto.producto}</strong>
-                      <small>{producto.categoria}</small>
-                    </span>
-                    <span className="product-search-stock">Stock {producto.stockCompleto}</span>
-                  </button>
-                ))}
+                {productosFiltrados.slice(0, MAX_SEARCH_RESULTS).map((producto) => {
+                  const disponible = hasRequestStock(producto);
+                  return (
+                    <button
+                      key={producto.id}
+                      type="button"
+                      className={`product-search-option${
+                        disponible ? '' : ' product-search-option--agotado'
+                      }`}
+                      role="option"
+                      aria-selected={producto.id === Number(productoId)}
+                      disabled={!disponible}
+                      onClick={() => {
+                        onSelect(String(producto.id));
+                        setBusqueda('');
+                      }}
+                    >
+                      <span>
+                        <strong>{producto.producto}</strong>
+                        <small>{producto.categoria}</small>
+                      </span>
+                      <span className="product-search-stock">
+                        {disponible ? `Stock ${producto.stockCompleto}` : 'AGOTADO'}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
               {productosFiltrados.length > MAX_SEARCH_RESULTS && (
                 <p className="product-search-hint">Escribe un poco más para reducir los resultados.</p>
@@ -75,14 +83,17 @@ export default function ProductSearch({ productos, productoId, onSelect }) {
           onChange={(event) => onSelect(event.target.value)}
         >
           <option value="">Elegir producto…</option>
-          {productos.map((producto) => (
-            <option key={producto.id} value={producto.id}>
-              {producto.producto} ({producto.categoria}) · stock {producto.stockCompleto}
-            </option>
-          ))}
+          {productos.map((producto) => {
+            const disponible = hasRequestStock(producto);
+            return (
+              <option key={producto.id} value={producto.id} disabled={!disponible}>
+                {producto.producto} ({producto.categoria}) ·{' '}
+                {disponible ? `stock ${producto.stockCompleto}` : 'AGOTADO'}
+              </option>
+            );
+          })}
         </select>
       )}
     </>
   );
 }
-
