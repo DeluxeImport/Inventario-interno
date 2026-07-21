@@ -1,7 +1,7 @@
 import { prisma } from '../lib/prisma.js';
 import { withEstado, clampLimit } from '../utils/index.js';
 import { notFound, badRequest } from '../lib/AppError.js';
-import { MOV_TIPOS } from '../constants/index.js';
+import { MOV_TIPOS, STOCK_ESTADOS } from '../constants/index.js';
 
 const parseFecha = (valor) => {
   if (!valor) return null;
@@ -75,7 +75,12 @@ export async function registrar(data, responsablePorDefecto) {
         observacion: observacion?.trim() || null,
       },
     });
-    return { mov, producto: withEstado(updated) };
+    const producto = withEstado(updated);
+    const estadoAntes = withEstado(prod).estado;
+    const alertaStock =
+      (estadoAntes === STOCK_ESTADOS.OK && producto.estado !== STOCK_ESTADOS.OK) ||
+      (estadoAntes === STOCK_ESTADOS.BAJO && producto.estado === STOCK_ESTADOS.AGOTADO);
+    return { mov, producto, alertaStock };
   });
 }
 
