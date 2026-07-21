@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { filterProducts } from '../src/lib/productSearch.js';
+import { filterProducts, hasRequestStock } from '../src/lib/productSearch.js';
 
 const products = [
   { id: 1, producto: 'Lápiz azul', categoria: 'Papelería' },
@@ -18,4 +18,10 @@ test('buscador de solicitudes: encuentra por categoría', () => {
 
 test('buscador de solicitudes: sin texto conserva todos los productos', () => {
   assert.equal(filterProducts(products, '').length, products.length);
+});
+
+test('solicitudes: bloquea productos sin stock completo', () => {
+  assert.equal(hasRequestStock({ stockCompleto: 0, stockIncompleto: 5 }), false);
+  assert.equal(hasRequestStock({ stockCompleto: -1 }), false);
+  assert.equal(hasRequestStock({ stockCompleto: 1 }), true);
 });

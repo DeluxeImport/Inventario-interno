@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '../../api/client';
 import Icon from '../common/Icon';
 import ProductSearch from './ProductSearch';
+import { hasRequestStock } from '../../lib/productSearch';
 
 export default function NuevoTicketModal({ onClose, onSaved, onError }) {
   const [solicitables, setSolicitables] = useState([]);
@@ -17,9 +18,10 @@ export default function NuevoTicketModal({ onClose, onSaved, onError }) {
   }, [onError]);
 
   const productoActual = solicitables.find((producto) => producto.id === Number(productoId));
+  const productoDisponible = hasRequestStock(productoActual);
 
   const agregar = () => {
-    if (!productoActual || cantidad < 1) return;
+    if (!productoActual || !productoDisponible || cantidad < 1) return;
 
     setItems((actuales) => {
       const existente = actuales.find((item) => item.productoId === productoActual.id);
@@ -115,7 +117,7 @@ export default function NuevoTicketModal({ onClose, onSaved, onError }) {
                   type="button"
                   className="btn btn-primary add-btn"
                   onClick={agregar}
-                  disabled={!productoId}
+                  disabled={!productoId || !productoDisponible}
                 >
                   <Icon name="mas" size={13} strokeWidth={2} />
                   Agregar al pedido
@@ -158,4 +160,3 @@ export default function NuevoTicketModal({ onClose, onSaved, onError }) {
     </div>
   );
 }
-
