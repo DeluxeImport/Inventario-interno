@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../api/client';
+import { useConfirm } from '../../hooks/useConfirm';
 import EstadoBadge from '../common/EstadoBadge';
 import Icon from '../common/Icon';
 import ProductoModal from './ProductoModal';
@@ -12,8 +13,14 @@ const PRODUCTO_VACIO = {
   stockCompleto: 0,
   stockIncompleto: 0,
   stockMinimo: 0,
+  precio: 0,
   solicitable: false,
 };
+
+const PAGE_SIZE = 50;
+
+// Precio con dos decimales. Ajustá el símbolo si tu moneda no es soles.
+const fmtPrecio = (v) => 'S/ ' + (Number(v) || 0).toFixed(2);
 
 // Clase de la fila según la gravedad del estado: agotado pesa más que stock bajo.
 const claseFila = (estado) => {
@@ -23,23 +30,47 @@ const claseFila = (estado) => {
 };
 
 export default function Inventario({ categorias, onChanged, onError }) {
+  const confirmar = useConfirm();
   const [productos, setProductos] = useState([]);
   const [q, setQ] = useState('');
   const [cat, setCat] = useState('Todas');
   const [loading, setLoading] = useState(true);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [editing, setEditing] = useState(null);
   const [movFor, setMovFor] = useState(null);
 
   const cargar = useCallback(async () => {
     setLoading(true);
     try {
-      setProductos(await api.productos(q, cat));
+      const page = await api.productos({ q, categoria: cat, limit: PAGE_SIZE });
+      setProductos(page.items);
+      setNextCursor(page.nextCursor);
     } catch (e) {
       onError(e.message);
     } finally {
       setLoading(false);
     }
   }, [q, cat, onError]);
+
+  const cargarMas = async () => {
+    if (!nextCursor || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const page = await api.productos({
+        q,
+        categoria: cat,
+        cursor: nextCursor,
+        limit: PAGE_SIZE,
+      });
+      setProductos((actuales) => [...actuales, ...page.items]);
+      setNextCursor(page.nextCursor);
+    } catch (e) {
+      onError(e.message);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   useEffect(() => {
     const t = setTimeout(cargar, 200);
@@ -52,8 +83,12 @@ export default function Inventario({ categorias, onChanged, onError }) {
   };
 
   const borrar = async (p) => {
-    if (!confirm(`¿Eliminar "${p.producto}"? Esto borra también su historial de movimientos.`))
-      return;
+    const ok = await confirmar({
+      title: `Eliminar "${p.producto}"`,
+      message: 'Esto borra también su historial de movimientos. Esta acción no se puede deshacer.',
+      confirmLabel: 'Eliminar',
+    });
+    if (!ok) return;
     try {
       await api.borrarProducto(p.id);
       recargarTodo();
@@ -87,7 +122,7 @@ export default function Inventario({ categorias, onChanged, onError }) {
         </button>
         {!loading && (
           <span className="toolbar-count">
-            {productos.length === 1 ? '1 producto' : `${productos.length} productos`}
+            {productos.length === 1 ? '1 producto cargado' : `${productos.length} productos cargados`}
           </span>
         )}
       </div>
@@ -102,6 +137,7 @@ export default function Inventario({ categorias, onChanged, onError }) {
                 <th>Producto</th>
                 <th>Categoría</th>
                 <th>Unidad de medida</th>
+                <th className="num">Precio</th>
                 <th className="num">Completo</th>
                 <th className="num">Incompleto</th>
                 <th className="num">Total</th>
@@ -123,6 +159,7 @@ export default function Inventario({ categorias, onChanged, onError }) {
                   </td>
                   <td data-label="Categoría">{p.categoria}</td>
                   <td data-label="Unidad">{p.unidad}</td>
+                  <td data-label="Precio" className="num">{fmtPrecio(p.precio)}</td>
                   <td data-label="Completo" className="num">{p.stockCompleto}</td>
                   <td data-label="Incompleto" className="num">{p.stockIncompleto}</td>
                   <td data-label="Total" className="num strong">{p.stockTotal}</td>
@@ -155,13 +192,20 @@ export default function Inventario({ categorias, onChanged, onError }) {
               ))}
               {productos.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="muted center">
+                  <td colSpan={10} className="muted center">
                     No hay productos que coincidan con la búsqueda.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+          {nextCursor && (
+            <div className="center" style={{ padding: '12px' }}>
+              <button className="btn btn-sm" onClick={cargarMas} disabled={loadingMore}>
+                {loadingMore ? 'Cargando…' : 'Cargar más'}
+              </button>
+            </div>
+          )}
         </div>
       )}
 

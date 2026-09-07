@@ -1,32 +1,43 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { api } from '../../api/client';
 import { fmtFecha } from '../../lib/format';
+import { useConfirm } from '../../hooks/useConfirm';
 import Icon from '../common/Icon';
 
 // Tamaño de página del backend (debe coincidir con el `limit` por defecto del servicio).
 const PAGE_SIZE = 100;
 
 export default function Movimientos({ onError, refreshKey, onChanged }) {
+  const confirmar = useConfirm();
   const [movs, setMovs] = useState([]);
   const [hayMas, setHayMas] = useState(false);
   const [cargandoMas, setCargandoMas] = useState(false);
+  const [desde, setDesde] = useState('');
+  const [hasta, setHasta] = useState('');
+  const [tipo, setTipo] = useState('');
+
+  const filtros = useMemo(
+    () => ({ desde: desde || undefined, hasta: hasta || undefined, tipo: tipo || undefined }),
+    [desde, hasta, tipo]
+  );
+  const hayFiltros = desde || hasta || tipo;
 
   const cargar = useCallback(() => {
     api
-      .movimientos()
+      .movimientos(filtros)
       .then((data) => {
         setMovs(data);
         setHayMas(data.length === PAGE_SIZE);
       })
       .catch((e) => onError(e.message));
-  }, [onError]);
+  }, [filtros, onError]);
 
   const cargarMas = useCallback(async () => {
     const ultimo = movs[movs.length - 1];
     if (!ultimo) return;
     setCargandoMas(true);
     try {
-      const data = await api.movimientos(null, { cursor: ultimo.id });
+      const data = await api.movimientos({ ...filtros, cursor: ultimo.id });
       setMovs((prev) => [...prev, ...data]);
       setHayMas(data.length === PAGE_SIZE);
     } catch (e) {
@@ -34,20 +45,25 @@ export default function Movimientos({ onError, refreshKey, onChanged }) {
     } finally {
       setCargandoMas(false);
     }
-  }, [movs, onError]);
+  }, [movs, filtros, onError]);
+
+  const limpiar = () => {
+    setDesde('');
+    setHasta('');
+    setTipo('');
+  };
 
   useEffect(() => {
     cargar();
   }, [cargar, refreshKey]);
 
   const borrar = async (m) => {
-    if (
-      !confirm(
-        `¿Eliminar este movimiento (${m.tipo} de ${m.cantidad} de "${m.producto?.producto}")?\n` +
-          'El stock se revertirá automáticamente.'
-      )
-    )
-      return;
+    const ok = await confirmar({
+      title: 'Eliminar movimiento',
+      message: `${m.tipo} de ${m.cantidad} de "${m.producto?.producto}". El stock se revertirá automáticamente.`,
+      confirmLabel: 'Eliminar',
+    });
+    if (!ok) return;
     try {
       await api.borrarMovimiento(m.id);
       cargar();
@@ -58,9 +74,45 @@ export default function Movimientos({ onError, refreshKey, onChanged }) {
   };
 
   return (
-    <div className="table-wrap">
-      <table>
-        <thead>
+    <div>
+      <div className="toolbar">
+        <div className="filtro">
+          <span>Desde</span>
+          <input
+            type="date"
+            value={desde}
+            max={hasta || undefined}
+            onChange={(e) => setDesde(e.target.value)}
+          />
+        </div>
+        <div className="filtro">
+          <span>Hasta</span>
+          <input
+            type="date"
+            value={hasta}
+            min={desde || undefined}
+            onChange={(e) => setHasta(e.target.value)}
+          />
+        </div>
+        <select value={tipo} onChange={(e) => setTipo(e.target.value)} aria-label="Tipo de movimiento">
+          <option value="">Todos</option>
+          <option value="ENTRADA">Registros de compra</option>
+          <option value="SALIDA">Salidas</option>
+        </select>
+        {hayFiltros && (
+          <button className="btn btn-sm" onClick={limpiar}>
+            Limpiar
+          </button>
+        )}
+        <span className="toolbar-count">
+          {movs.length}
+          {hayMas ? '+' : ''} movimiento{movs.length === 1 ? '' : 's'}
+        </span>
+      </div>
+
+      <div className="table-wrap">
+        <table>
+          <thead>
           <tr>
             <th>Producto</th>
             <th>Fecha</th>
@@ -83,7 +135,7 @@ export default function Movimientos({ onError, refreshKey, onChanged }) {
                   className={`badge badge--icono badge-${m.tipo === 'ENTRADA' ? 'ok' : 'mov'}`}
                 >
                   <Icon name={m.tipo === 'ENTRADA' ? 'entrada' : 'salida'} size={12} />
-                  {m.tipo === 'ENTRADA' ? 'Entrada' : 'Salida'}
+                  {m.tipo === 'ENTRADA' ? 'Registro de compra' : 'Salida'}
                 </span>
               </td>
               <td data-label="Cantidad" className="num strong">{m.cantidad}</td>
@@ -120,6 +172,7 @@ export default function Movimientos({ onError, refreshKey, onChanged }) {
           </button>
         </div>
       )}
+      </div>
     </div>
   );
 }

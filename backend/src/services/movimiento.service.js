@@ -3,10 +3,34 @@ import { withEstado, clampLimit } from '../utils/index.js';
 import { notFound, badRequest } from '../lib/AppError.js';
 import { MOV_TIPOS, STOCK_ESTADOS } from '../constants/index.js';
 
+// Convierte 'YYYY-MM-DD' a una fecha local válida; null si es inválida o vacía.
+const parseFecha = (s) => {
+  if (!s) return null;
+  const d = new Date(`${s}T00:00:00`);
+  return Number.isNaN(d.getTime()) ? null : d;
+};
+
 // Lista paginada por cursor (id descendente ≈ más reciente primero). `cursor` = id del
 // último movimiento ya cargado; devuelve la página siguiente (más antiguos).
-export function listar({ productoId, limit, cursor } = {}) {
-  const where = productoId ? { productoId: Number(productoId) } : {};
+// Filtros opcionales: productoId, tipo (ENTRADA/SALIDA) y rango de fechas (desde/hasta).
+export function listar({ productoId, limit, cursor, desde, hasta, tipo } = {}) {
+  const where = {};
+  if (productoId) where.productoId = Number(productoId);
+  if (tipo === MOV_TIPOS.ENTRADA || tipo === MOV_TIPOS.SALIDA) where.tipo = tipo;
+
+  const d = parseFecha(desde);
+  const h = parseFecha(hasta);
+  if (d || h) {
+    where.fecha = {};
+    if (d) where.fecha.gte = d;
+    if (h) {
+      // "hasta" incluye todo ese día: menor que el día siguiente.
+      const finDia = new Date(h);
+      finDia.setDate(finDia.getDate() + 1);
+      where.fecha.lt = finDia;
+    }
+  }
+
   const take = clampLimit(limit, 100, 200);
   return prisma.movimiento.findMany({
     where,

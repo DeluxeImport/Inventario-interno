@@ -18,6 +18,9 @@ const stockNoNegativo = z.coerce
   .int('El stock debe ser un número entero.')
   .min(0, 'El stock no puede ser negativo.');
 
+// Precio: número no negativo (admite decimales).
+const precioNoNegativo = z.coerce.number().min(0, 'El precio no puede ser negativo.');
+
 // Rol válido contra la lista de roles permitidos (evita roles arbitrarios).
 const rolValido = z
   .string()
@@ -33,6 +36,7 @@ export const productoCrearSchema = z.object({
   stockCompleto: stockNoNegativo.optional(),
   stockIncompleto: stockNoNegativo.optional(),
   stockMinimo: stockNoNegativo.optional(),
+  precio: precioNoNegativo.optional(),
   solicitable: z.boolean().optional(),
 });
 
@@ -43,6 +47,7 @@ export const productoEditarSchema = z.object({
   stockCompleto: stockNoNegativo.optional(),
   stockIncompleto: stockNoNegativo.optional(),
   stockMinimo: stockNoNegativo.optional(),
+  precio: precioNoNegativo.optional(),
   solicitable: z.boolean().optional(),
 });
 
@@ -104,4 +109,37 @@ export const ticketEstadoSchema = z.object({
       })
     )
     .optional(),
+});
+
+// ----- Traspasos -----
+export const traspasoCrearSchema = z.object({
+  destinoTienda: z.string().trim().min(1, 'Selecciona la tienda destino.'),
+  producto: z.string().trim().min(1, 'Describe el producto a traspasar.'),
+  codigoProducto: z.string().trim().min(1, 'Ingresa el código del producto.'),
+  cantidad: z.coerce.number().int().positive('La cantidad debe ser mayor a 0.'),
+  unidad: z.string().optional(),
+  nota: z.string().optional(),
+});
+
+export const traspasoEstadoSchema = z.object({
+  accion: z.enum(['aceptar', 'rechazar', 'cancelar'], 'Acción inválida.'),
+  motivo: z.string().optional(),
+});
+
+export const traspasoCopiadoSchema = z.object({
+  copiado: z.boolean('Indica si está registrado en el sistema real.'),
+  observacion: z.string().max(1000, 'La observación admite hasta 1000 caracteres.').optional(),
+});
+
+// ----- Push -----
+export const pushSuscripcionSchema = z.object({
+  endpoint: z.string().trim().url('Suscripción inválida.'),
+  keys: z.object({
+    p256dh: z.string().trim().min(1, 'Suscripción inválida.'),
+    auth: z.string().trim().min(1, 'Suscripción inválida.'),
+  }),
+});
+
+export const pushDesuscribirSchema = z.object({
+  endpoint: z.string().trim().url('Suscripción inválida.'),
 });

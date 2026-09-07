@@ -11,6 +11,7 @@ import {
 import { ROLES_LIST, STOCK_ESTADOS } from '../src/constants/index.js';
 import { buildConfig } from '../src/config/buildConfig.js';
 import { soloAlmacen } from '../src/middleware/auth.js';
+import { decodeCursor, encodeCursor, pageResult } from '../src/lib/pagination.js';
 import {
   productoCrearSchema,
   usuarioCrearSchema,
@@ -85,6 +86,26 @@ test('clampLimit: recorta al máximo y respeta valores válidos', () => {
   assert.equal(clampLimit(50, 100, 200), 50);
   assert.equal(clampLimit(999, 100, 200), 200);
   assert.equal(clampLimit('30', 100, 200), 30);
+});
+
+test('cursores: codifica y valida un cursor opaco', () => {
+  const value = { categoria: 'Cabello', producto: 'Shampoo', id: 42 };
+  const encoded = encodeCursor(value);
+  assert.deepEqual(
+    decodeCursor(encoded, (c) => Number.isInteger(c.id) && typeof c.producto === 'string'),
+    value
+  );
+});
+
+test('cursores: rechaza valores manipulados', () => {
+  assert.throws(() => decodeCursor('no-es-un-cursor', () => true), /Cursor de paginación inválido/);
+});
+
+test('pageResult: separa el registro centinela y genera el siguiente cursor', () => {
+  const page = pageResult([{ id: 1 }, { id: 2 }, { id: 3 }], 2, ({ id }) => ({ id }));
+  assert.deepEqual(page.items, [{ id: 1 }, { id: 2 }]);
+  assert.equal(page.hasMore, true);
+  assert.deepEqual(decodeCursor(page.nextCursor, (c) => Number.isInteger(c.id)), { id: 2 });
 });
 
 test('ROLES_LIST contiene los cuatro roles esperados', () => {

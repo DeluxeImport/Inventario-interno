@@ -47,26 +47,28 @@
   gap: 9px;
   padding: 6px 6px 0;
 }
-.brand .logo {
+.brand-chip {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   flex: none;
-  color: #fff;
-  background: linear-gradient(180deg, var(--accent), var(--accent-press));
-  border-radius: 7px;
-  box-shadow: var(--shadow-control);
+  background: var(--accent-soft);
+  border-radius: 8px;
 }
-.brand h1 {
-  font-size: 13px;
-  font-weight: 590;
-  letter-spacing: -0.008em;
+.brand-chip img { width: 17px; height: 17px; }
+.brand-word {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
   line-height: 1.2;
+  color: var(--navy);
 }
-.brand p {
+.brand-tagline {
   margin: 0;
   font-size: 11px;
+  font-weight: 510;
   color: var(--ink-3);
 }
 
@@ -226,6 +228,16 @@ main {
 .toolbar > select,
 .toolbar > input { width: auto; min-width: 160px; }
 
+/* Filtro con etiqueta en línea (ej. fechas de Movimientos). */
+.toolbar .filtro {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.toolbar .filtro input { width: auto; min-width: 0; }
+
 /* Campo de búsqueda con icono embebido. */
 .search-field { position: relative; display: flex; align-items: center; }
 .search-field .icon {
@@ -261,137 +273,210 @@ main {
 }
 
 /* ---------------- Login ---------------- */
+/* Pantalla única: portada de marca a la izquierda, formulario con los 3
+   portales (tabs) a la derecha. Sigue habiendo 3 portales — la validación
+   del rol contra el portal elegido la hace el backend (ver auth.service) —
+   pero ya no hay un paso de selección separado. */
 
-.login-wrap {
+.login-split {
   display: grid;
-  place-items: center;
-  align-content: center;
+  grid-template-columns: minmax(280px, 38%) 1fr;
   min-height: 100dvh;
-  padding: 24px;
-  background:
-    radial-gradient(60rem 40rem at 50% -10%, var(--accent-soft), transparent 70%),
-    var(--bg);
 }
-.login-wrap--tienda {
-  background:
-    radial-gradient(60rem 40rem at 50% -10%, var(--violet-soft), transparent 70%),
-    var(--bg);
-}
-.login-wrap--area {
-  background:
-    radial-gradient(60rem 40rem at 50% -10%, var(--teal-soft), transparent 70%),
-    var(--bg);
+/* Ventanas angostas (pero no tanto como para ocultar la portada, ver media
+   query más abajo): la portada gana ancho para que la foto del equipo no
+   quede diminuta contra una columna muy estrecha. */
+@media (min-width: 760px) and (max-width: 1100px) {
+  .login-split { grid-template-columns: minmax(280px, 48%) 1fr; }
 }
 
-.login-picker { text-align: center; }
-.login-picker-title { font-size: 24px; letter-spacing: -0.02em; }
-.login-picker-sub {
-  margin: 4px 0 26px;
-  font-size: 13px;
-  color: var(--ink-3);
-}
-.login-picker-cards {
-  display: flex;
-  gap: 14px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-/* Tarjeta de selección: superficie elevada, no un botón hinchado. */
-.login-card-pick {
+.login-cover {
+  position: relative;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 36px 34px;
+  background: var(--hero-grad);
+  color: #fff;
+  overflow: hidden;
+}
+.login-cover-mark {
+  position: absolute;
+  right: -80px;
+  bottom: -80px;
+  width: 340px;
+  height: 340px;
+  opacity: 0.12;
+  pointer-events: none;
+}
+.login-cover-logo { position: relative; z-index: 1; display: block; height: 26px; width: auto; align-self: flex-start; }
+
+/* Equipo Coral, de polo: ilustración plana (mismo lenguaje de formas
+   redondeadas que el isotipo), difuminada hacia abajo para que se disuelva
+   en el degradado en vez de cortar en seco. */
+.login-cover-people {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
   align-items: center;
-  gap: 4px;
-  width: 232px;
-  padding: 26px 20px 22px;
-  font: inherit;
-  color: var(--ink);
-  text-align: center;
-  background: var(--panel);
-  border: 0.5px solid var(--line);
-  border-radius: 14px;
-  box-shadow: var(--shadow-panel);
-  cursor: pointer;
-  transition: transform 180ms var(--ease), box-shadow 180ms var(--ease);
+  justify-content: center;
+  width: calc(100% + 68px);
+  margin: 0 -34px;
+  min-height: 70px;
 }
-.login-card-pick:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-pop);
-}
-.login-card-pick:active { transform: translateY(0); }
-.login-card-pick-icon { margin-bottom: 10px; color: var(--accent); }
-.login-card-pick--tienda .login-card-pick-icon { color: var(--violet); }
-.login-card-pick--area .login-card-pick-icon { color: var(--teal); }
-.login-card-pick-title { font-size: 14px; font-weight: 590; }
-.login-card-pick-desc {
-  font-size: 12px;
-  color: var(--ink-3);
-  line-height: 1.4;
-  max-width: 22ch;
+.login-cover-people img {
+  width: 100%;
+  max-width: min(680px, 92%);
+  max-height: 56dvh;
+  height: auto;
+  object-fit: contain;
+  /* La foto ya trae un difuminado hacia abajo; este remate solo asegura que
+     el último tramo se disuelva del todo en el degradado. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 75%, transparent 98%);
+  mask-image: linear-gradient(to bottom, #000 75%, transparent 98%);
 }
 
-.login-card {
-  position: relative;
+.login-cover-msg { position: relative; z-index: 1; }
+.login-cover-msg h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+  max-width: 22ch;
+  text-wrap: balance;
+}
+.login-cover-msg p {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(235, 235, 245, 0.68);
+  line-height: 1.55;
+  max-width: 30ch;
+}
+
+.login-form-pane {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  background:
+    radial-gradient(50rem 34rem at 50% -8%, var(--accent-soft), transparent 65%),
+    var(--bg);
+}
+
+/* Panel de vidrio: mismo material translúcido que la barra lateral, en vez
+   de los controles flotando sueltos sobre el fondo. */
+.login-unified-card {
   display: flex;
   flex-direction: column;
   gap: 12px;
   width: min(360px, 100%);
-  padding: 26px 26px 24px;
-  background: var(--panel);
+  padding: 30px 28px 26px;
+  background: color-mix(in srgb, var(--panel) 72%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
   border: 0.5px solid var(--line);
-  border-radius: 14px;
+  border-radius: var(--r-modal);
   box-shadow: var(--shadow-pop);
 }
-.login-card h1 { font-size: 19px; text-align: center; }
-.login-sub {
-  margin: -8px 0 4px;
+@supports not (backdrop-filter: blur(1px)) {
+  .login-unified-card { background: var(--panel); }
+}
+
+.login-unified-title { margin: 0 0 2px; font-size: 18px; font-weight: 700; text-align: center; letter-spacing: -0.012em; }
+
+/* La portada ya trae el logo; en el panel de formulario solo hace falta
+   cuando la portada se oculta (pantallas angostas, ver media query). */
+.login-form-logo { display: none; height: 22px; width: auto; align-self: center; }
+
+.tabs {
+  display: inline-flex;
+  align-self: center;
+  padding: 3px;
+  gap: 2px;
+  background: var(--panel-2);
+  border: 0.5px solid var(--line);
+  border-radius: var(--r-pill);
+}
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--ink-3);
+  background: none;
+  border: 0;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: background 140ms var(--ease), color 140ms var(--ease);
+}
+.tab:hover { color: var(--ink-2); }
+.tab[data-on='true'] { color: var(--accent-ink); background: var(--accent); }
+
+.login-unified-sub {
+  margin: -4px 0 4px;
   font-size: 12.5px;
   color: var(--ink-3);
   text-align: center;
 }
-.login-logo { display: grid; place-items: center; color: var(--accent); }
-.login-card--tienda .login-logo { color: var(--violet); }
-.login-card--area .login-logo { color: var(--teal); }
 
-.login-back {
+/* Campos: etiqueta discreta + icono a la izquierda, en vez del input plano. */
+.login-unified-card label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.login-unified-card label > .login-field { margin-top: 5px; }
+
+.login-field { position: relative; display: flex; align-items: center; }
+.login-field-icon {
   position: absolute;
-  top: 14px;
-  left: 12px;
+  left: 11px;
+  color: var(--ink-3);
+  pointer-events: none;
+  transition: color 140ms var(--ease);
+  z-index: 2;
+}
+.login-field input,
+.login-field--pass .pass-field input { padding-left: 33px; }
+.login-field--pass .pass-field { width: 100%; }
+.login-field:focus-within .login-field-icon { color: var(--accent); }
+
+.login-unified-btn {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  padding: 4px 6px;
-  font: inherit;
-  font-size: 12.5px;
-  color: var(--accent);
-  background: none;
-  border: 0;
-  border-radius: 5px;
-  cursor: pointer;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 6px;
+  min-height: 34px;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 6px 16px -6px color-mix(in srgb, var(--accent) 55%, transparent);
+  transition: background 120ms var(--ease), transform 60ms var(--ease), box-shadow 160ms var(--ease);
 }
-.login-back:hover { background: var(--accent-soft); }
-/* Cada portal mantiene su color: el azul no aparece dentro de otro portal. */
-.login-card--tienda .login-back { color: var(--violet); }
-.login-card--tienda .login-back:hover { background: var(--violet-soft); }
-.login-card--tienda input:focus-visible,
-.login-card--tienda .pass-field input:focus-visible {
-  border-color: var(--violet);
-  box-shadow: 0 0 0 3.5px var(--violet-soft);
+.login-unified-btn:hover:not(:disabled) {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 10px 22px -6px color-mix(in srgb, var(--accent) 65%, transparent);
 }
-.login-card--area .login-back { color: var(--teal); }
-.login-card--area .login-back:hover { background: var(--teal-soft); }
-.login-card--area input:focus-visible,
-.login-card--area .pass-field input:focus-visible {
-  border-color: var(--teal);
-  box-shadow: 0 0 0 3.5px var(--teal-soft);
-}
+.login-btn-arrow { transition: transform 160ms var(--ease); }
+.login-unified-btn:hover:not(:disabled) .login-btn-arrow { transform: translateX(2px); }
 
-.login-btn { width: 100%; margin-top: 4px; min-height: 32px; }
-.login-card--tienda .login-btn { background: var(--violet); }
-.login-card--tienda .login-btn:hover { background: var(--violet); filter: brightness(0.94); }
-.login-card--area .login-btn { background: var(--teal); }
-.login-card--area .login-btn:hover { background: var(--teal); filter: brightness(0.94); }
+.login-support {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--ink-3);
+  text-align: center;
+}
+.login-support a { color: var(--accent-press); font-weight: 600; text-decoration: none; }
+.login-support a:hover { text-decoration: underline; }
 
 .login-error {
   padding: 8px 10px;
@@ -401,17 +486,17 @@ main {
   border-radius: var(--r-control);
 }
 
-/* Carrusel de logos: decorativo; se detiene si se pide reducir el movimiento. */
+/* Carrusel de logos: dentro de la tarjeta, solo para el portal de Tiendas. */
 .tienda-carrusel {
-  width: min(560px, 90vw);
-  margin-top: 26px;
+  width: 100%;
+  margin-top: 2px;
   overflow: hidden;
   mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
 }
 .tienda-carrusel-track {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   width: max-content;
   animation: carrusel 32s linear infinite;
 }
@@ -424,8 +509,8 @@ main {
 .tienda-logo {
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
+  width: 40px;
+  height: 40px;
   flex: none;
   background: var(--panel);
   border: 0.5px solid var(--line);
@@ -435,7 +520,15 @@ main {
 }
 .tienda-logo img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 .tienda-logo--placeholder {
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 590;
   color: var(--ink-3);
+}
+
+/* La portada no compite con el formulario en pantallas angostas. */
+@media (max-width: 760px) {
+  .login-split { grid-template-columns: 1fr; }
+  .login-cover { display: none; }
+  .login-form-pane { min-height: 100dvh; }
+  .login-form-logo { display: block; }
 }

@@ -15,6 +15,10 @@ const schema = z.object({
   // Notificaciones por WhatsApp vía CallMeBot (opcional). Si faltan, se desactiva.
   CALLMEBOT_PHONE: z.string().optional(),
   CALLMEBOT_APIKEY: z.string().optional(),
+  // Notificaciones push del navegador (opcional). Si faltan, se desactiva.
+  VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
+  VAPID_SUBJECT: z.string().default('mailto:sistemas@example.com'),
 });
 
 const parseCorsOrigins = (value) =>
@@ -44,6 +48,12 @@ export function buildConfig(env = process.env) {
       enabled: Boolean(parsed.data.CALLMEBOT_PHONE && parsed.data.CALLMEBOT_APIKEY),
       phone: parsed.data.CALLMEBOT_PHONE || null,
       apikey: parsed.data.CALLMEBOT_APIKEY || null,
+    },
+    push: {
+      enabled: Boolean(parsed.data.VAPID_PUBLIC_KEY && parsed.data.VAPID_PRIVATE_KEY),
+      publicKey: parsed.data.VAPID_PUBLIC_KEY || null,
+      privateKey: parsed.data.VAPID_PRIVATE_KEY || null,
+      subject: parsed.data.VAPID_SUBJECT,
     },
   };
 }

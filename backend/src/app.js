@@ -11,14 +11,17 @@ import authRoutes from './routes/auth.routes.js';
 import productosRoutes from './routes/productos.routes.js';
 import movimientosRoutes from './routes/movimientos.routes.js';
 import ticketsRoutes from './routes/tickets.routes.js';
+import traspasosRoutes from './routes/traspasos.routes.js';
 import usuariosRoutes from './routes/usuarios.routes.js';
 import actividadesRoutes from './routes/actividades.routes.js';
 import catalogoRoutes from './routes/catalogo.routes.js';
 import tiendasRoutes from './routes/tiendas.routes.js';
+import pushRoutes from './routes/push.routes.js';
 
 // Carpeta del frontend ya compilado (frontend/dist), relativa a este archivo (backend/src).
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const distDir = join(__dirname, '../../frontend/dist');
+const uploadsDir = join(__dirname, '../uploads');
 
 // Limita los intentos de inicio de sesión por IP (mitiga fuerza bruta de credenciales).
 const loginLimiter = rateLimit({
@@ -43,13 +46,18 @@ export function createApp() {
   app.use('/api/productos', productosRoutes);
   app.use('/api/movimientos', movimientosRoutes);
   app.use('/api/tickets', ticketsRoutes);
+  app.use('/api/traspasos', traspasosRoutes);
   app.use('/api/usuarios', usuariosRoutes);
   app.use('/api/actividades', actividadesRoutes);
   app.use('/api/tiendas', tiendasRoutes); // /publicas (sin auth, para login)
+  app.use('/api/push', pushRoutes);
   app.use('/api', catalogoRoutes); // /categorias, /stats, /solicitables
 
   // 404 en JSON solo para rutas de API no encontradas.
   app.use('/api', notFoundHandler);
+
+  // Fotos de traspasos subidas por las tiendas (evidencia opcional).
+  if (existsSync(uploadsDir)) app.use('/uploads', express.static(uploadsDir));
 
   // Servicio unificado: si existe el build del frontend, se sirve aquí mismo,
   // de modo que la web y la API corren en un solo proceso y puerto.

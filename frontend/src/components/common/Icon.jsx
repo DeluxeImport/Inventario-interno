@@ -46,11 +46,18 @@ const PATHS = {
   tienda: <><path d="M3.6 9.2h16.8L18.9 4H5.1Z" /><path d="M4.8 9.2v11.2h14.4V9.2" /><path d="M9.6 20.4v-5.6h4.8v5.6" /></>,
   edificio: <><path d="M5.4 20.4V4.8a1.2 1.2 0 0 1 1.2-1.2h10.8a1.2 1.2 0 0 1 1.2 1.2v15.6" /><path d="M2.8 20.4h18.4" /><path d="M9 7.6h1.6" /><path d="M13.4 7.6H15" /><path d="M9 11.6h1.6" /><path d="M13.4 11.6H15" /><path d="M10.4 20.4v-4.2h3.2v4.2" /></>,
   persona: <><circle cx="12" cy="7.6" r="3.6" /><path d="M4.8 20.4v-1.2a5 5 0 0 1 5-5h4.4a5 5 0 0 1 5 5v1.2" /></>,
+  candado: <><rect x="4.8" y="10.6" width="14.4" height="9.8" rx="2" /><path d="M7.6 10.6V7.4a4.4 4.4 0 0 1 8.8 0v3.2" /><circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none" /></>,
+  flecha: <><path d="M4.6 12h14.8" /><path d="m13.4 6 6 6-6 6" /></>,
   etiqueta: <><path d="M3.8 11.2V4.8a1 1 0 0 1 1-1h6.4a1 1 0 0 1 .7.3l8 8a1 1 0 0 1 0 1.4l-6.4 6.4a1 1 0 0 1-1.4 0l-8-8a1 1 0 0 1-.3-.7Z" /><circle cx="7.8" cy="7.8" r="1.3" /></>,
   nota: <><path d="M6 3.6h8.4l4.6 4.6v12.2H6Z" /><path d="M14.2 3.6v4.8h4.8" /><path d="M9.2 13h6" /><path d="M9.2 16.6h4" /></>,
   descarga: <><path d="M12 3.6v11.2" /><path d="m7.6 10.6 4.4 4.4 4.4-4.4" /><path d="M4.4 15.6v3.2a1.6 1.6 0 0 0 1.6 1.6h12a1.6 1.6 0 0 0 1.6-1.6v-3.2" /></>,
   libro: <><path d="M4.2 5a1.4 1.4 0 0 1 1.4-1.4H18a1 1 0 0 1 1 1v13.8H5.6A1.4 1.4 0 0 0 4.2 19.8Z" /><path d="M4.2 19.8a1.4 1.4 0 0 1 1.4-1.4H19" /><path d="M8 7.8h7" /><path d="M8 11.2h7" /></>,
   megafono: <><path d="M4 9.4v3.2a1.4 1.4 0 0 0 1.4 1.4H8l6 4V5.4l-6 4H5.4A1.4 1.4 0 0 0 4 9.4Z" /><path d="M8 14v4.2a1.2 1.2 0 0 0 1.2 1.2h1a1.2 1.2 0 0 0 1.2-1.2v-2.6" /><path d="M18 8.6a4 4 0 0 1 0 4.8" /></>,
+
+  // Traspasos: intercambio entre dos partes (distinto del "transfer" vertical de Movimientos).
+  intercambio: <><path d="M3.6 8.2h14.6" /><path d="m13.8 3.8 4.4 4.4-4.4 4.4" /><path d="M20.4 15.8H5.8" /><path d="m10.2 20.2-4.4-4.4 4.4-4.4" /></>,
+
+  portapapeles: <><rect x="7.2" y="5.2" width="9.6" height="15.2" rx="1.6" /><path d="M9.6 5.2V4a1.2 1.2 0 0 1 1.2-1.2h2.4A1.2 1.2 0 0 1 14.4 4v1.2" /></>,
 };
 
 export default function Icon({ name, size = 16, title, className, strokeWidth = 1.6 }) {

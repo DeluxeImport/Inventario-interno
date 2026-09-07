@@ -18,7 +18,16 @@ const iniciales = (nombre = '') =>
  *
  * Se oculta por CSS en escritorio, donde manda la barra lateral.
  */
-export default function BottomNav({ user, tabs, activeView, stats, ticketsPend, onSelect, onLogout }) {
+export default function BottomNav({
+  user,
+  tabs,
+  activeView,
+  stats,
+  ticketsPend,
+  traspasosPend,
+  onSelect,
+  onLogout,
+}) {
   const [masAbierto, setMasAbierto] = useState(false);
   const masBtnRef = useRef(null);
   const sheetRef = useRef(null);
@@ -62,6 +71,7 @@ export default function BottomNav({ user, tabs, activeView, stats, ticketsPend, 
   const contadorDe = (k) => {
     if (k === 'dashboard' && alertasStock > 0) return { n: alertasStock, alerta: false };
     if (k === 'tickets' && ticketsPend > 0) return { n: ticketsPend, alerta: true };
+    if (k === 'traspasos' && traspasosPend > 0) return { n: traspasosPend, alerta: true };
     return null;
   };
 

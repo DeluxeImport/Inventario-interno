@@ -79,6 +79,9 @@ export default function Dashboard({ stats }) {
             )}
           </tbody>
         </table>
+        {stats.alertasLimitadas && (
+          <p className="muted center">Mostrando las 200 alertas más urgentes.</p>
+        )}
       </div>
 
       <h3 className="section-title">

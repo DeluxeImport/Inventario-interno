@@ -1,16 +1,41 @@
 import { prisma } from '../lib/prisma.js';
-import { withEstado } from '../utils/index.js';
-import { STOCK_ESTADOS } from '../constants/index.js';
+import { clampLimit, withEstado } from '../utils/index.js';
+import { decodeCursor, pageResult } from '../lib/pagination.js';
 
-export async function listar({ q, categoria } = {}) {
-  const where = {};
-  if (categoria && categoria !== 'Todas') where.categoria = categoria;
-  if (q) where.producto = { contains: q, mode: 'insensitive' };
-  const productos = await prisma.producto.findMany({
-    where,
-    orderBy: [{ categoria: 'asc' }, { producto: 'asc' }],
+const esCursorProducto = (c) =>
+  c &&
+  typeof c.categoria === 'string' &&
+  typeof c.producto === 'string' &&
+  Number.isInteger(c.id) &&
+  c.id > 0;
+
+export async function listar({ q, categoria, limit, cursor } = {}) {
+  const filtros = [];
+  if (categoria && categoria !== 'Todas') filtros.push({ categoria });
+  if (q?.trim()) filtros.push({ producto: { contains: q.trim(), mode: 'insensitive' } });
+
+  const posicion = decodeCursor(cursor, esCursorProducto);
+  if (posicion) {
+    filtros.push({
+      OR: [
+        { categoria: { gt: posicion.categoria } },
+        { categoria: posicion.categoria, producto: { gt: posicion.producto } },
+        { categoria: posicion.categoria, producto: posicion.producto, id: { gt: posicion.id } },
+      ],
+    });
+  }
+
+  const pageSize = clampLimit(limit, 50, 100);
+  const rows = await prisma.producto.findMany({
+    where: filtros.length > 0 ? { AND: filtros } : undefined,
+    orderBy: [{ categoria: 'asc' }, { producto: 'asc' }, { id: 'asc' }],
+    take: pageSize + 1,
   });
-  return productos.map(withEstado);
+  return pageResult(rows.map(withEstado), pageSize, ({ categoria, producto, id }) => ({
+    categoria,
+    producto,
+    id,
+  }));
 }
 
 export async function categorias() {
@@ -31,6 +56,7 @@ export async function crear(data) {
       stockCompleto: Number(data.stockCompleto) || 0,
       stockIncompleto: Number(data.stockIncompleto) || 0,
       stockMinimo: Number(data.stockMinimo) || 0,
+      precio: Number(data.precio) || 0,
       solicitable: !!data.solicitable,
     },
   });
@@ -47,6 +73,7 @@ export async function actualizar(id, data) {
       stockCompleto: data.stockCompleto != null ? Number(data.stockCompleto) : undefined,
       stockIncompleto: data.stockIncompleto != null ? Number(data.stockIncompleto) : undefined,
       stockMinimo: data.stockMinimo != null ? Number(data.stockMinimo) : undefined,
+      precio: data.precio != null ? Number(data.precio) : undefined,
       solicitable: data.solicitable != null ? !!data.solicitable : undefined,
     },
   });
@@ -66,16 +93,53 @@ export async function solicitables() {
 }
 
 export async function stats() {
-  const productos = (await prisma.producto.findMany()).map(withEstado);
-  const porCategoria = {};
-  for (const p of productos) porCategoria[p.categoria] = (porCategoria[p.categoria] || 0) + 1;
+  const [resumenRows, categoriasRows, alertas] = await Promise.all([
+    prisma.$queryRaw`
+      SELECT
+        COUNT(*)::int AS "totalProductos",
+        COUNT(*) FILTER (
+          WHERE ("stockCompleto" + "stockIncompleto") > 0
+            AND ("stockCompleto" + "stockIncompleto") <= "stockMinimo"
+        )::int AS "bajoMinimo",
+        COUNT(*) FILTER (
+          WHERE ("stockCompleto" + "stockIncompleto") <= 0
+        )::int AS "agotados"
+      FROM "Producto"
+    `,
+    prisma.producto.groupBy({
+      by: ['categoria'],
+      _count: { _all: true },
+      orderBy: { categoria: 'asc' },
+    }),
+    prisma.$queryRaw`
+      SELECT
+        id,
+        categoria,
+        producto,
+        "stockMinimo",
+        ("stockCompleto" + "stockIncompleto")::int AS "stockTotal",
+        CASE
+          WHEN ("stockCompleto" + "stockIncompleto") <= 0 THEN 'AGOTADO'
+          ELSE 'BAJO'
+        END AS estado
+      FROM "Producto"
+      WHERE ("stockCompleto" + "stockIncompleto") <= "stockMinimo"
+      ORDER BY
+        CASE WHEN ("stockCompleto" + "stockIncompleto") <= 0 THEN 0 ELSE 1 END,
+        ("stockCompleto" + "stockIncompleto") ASC,
+        producto ASC
+      LIMIT 200
+    `,
+  ]);
+
+  const resumen = resumenRows[0] || { totalProductos: 0, bajoMinimo: 0, agotados: 0 };
+  const porCategoria = Object.fromEntries(
+    categoriasRows.map((row) => [row.categoria, row._count._all])
+  );
   return {
-    totalProductos: productos.length,
-    bajoMinimo: productos.filter((p) => p.estado === STOCK_ESTADOS.BAJO).length,
-    agotados: productos.filter((p) => p.estado === STOCK_ESTADOS.AGOTADO).length,
+    ...resumen,
     porCategoria,
-    alertas: productos
-      .filter((p) => p.estado !== STOCK_ESTADOS.OK)
-      .sort((a, b) => a.stockTotal - b.stockTotal),
+    alertas,
+    alertasLimitadas: resumen.bajoMinimo + resumen.agotados > alertas.length,
   };
 }

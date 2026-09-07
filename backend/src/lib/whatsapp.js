@@ -16,7 +16,12 @@ export async function enviarWhatsapp(texto) {
 
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    if (!res.ok) console.error(`[whatsapp] CallMeBot respondió ${res.status}`);
+    // CallMeBot responde 200 incluso cuando limita o falla; el detalle va en el
+    // cuerpo. Revisamos ambos para que un fallo no pase inadvertido.
+    const body = (await res.text()).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!res.ok || /error|invalid|not allowed|too fast|apikey/i.test(body)) {
+      console.error(`[whatsapp] CallMeBot no envió (${res.status}): ${body.slice(0, 200)}`);
+    }
   } catch (e) {
     console.error('[whatsapp] no se pudo enviar:', e.message);
   }

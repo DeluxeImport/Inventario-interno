@@ -1,21 +1,24 @@
 /* Tokens y controles primitivos.
    Lenguaje visual tomado de macOS (AppKit): materiales translúcidos, esquinas
-   continuas, hairlines de bajo contraste y un único azul de acento reservado a
-   lo interactivo. Los colores semánticos (verde/ámbar/rojo) NUNCA se usan para
-   navegación: solo comunican estado.
+   continuas, hairlines de bajo contraste y un único acento de marca reservado
+   a lo interactivo. Los colores semánticos (verde/ámbar/rojo) NUNCA se usan
+   para navegación: solo comunican estado.
 
-   Tipografía del sistema: en macOS resuelve a SF Pro; en Windows 11 a Segoe UI
-   Variable. No se descarga ninguna fuente — cero peticiones de red, sin FOUT. */
+   Paleta de marca (Coral): azul ultramar #2e2c7e, humo azulado #e9eff1 y
+   coral vibrante #eb6445 — este último es el acento interactivo.
+
+   Tipografía de marca: Nunito, auto-hospedada vía @fontsource (ver main.jsx)
+   — cero peticiones de red, sin FOUT. */
 
 :root {
   color-scheme: light dark;
 
-  /* Materiales y fondos */
-  --bg: #e6e6ea;              /* cromo de la ventana (más gris para que los paneles resalten) */
-  --sidebar: rgba(244, 244, 247, 0.75);
-  --sidebar-solid: #f4f4f7;
+  /* Materiales y fondos (tintados con el humo azulado de marca) */
+  --bg: #e4e7ec;              /* cromo de la ventana (más gris para que los paneles resalten) */
+  --sidebar: rgba(241, 243, 246, 0.75);
+  --sidebar-solid: #f1f3f6;
   --panel: #ffffff;           /* contenido */
-  --panel-2: #f5f5f8;         /* filas alternas, cabeceras de tabla */
+  --panel-2: #f2f4f7;         /* filas alternas, cabeceras de tabla */
   --overlay: rgba(0, 0, 0, 0.30);
 
   /* Texto */
@@ -29,12 +32,15 @@
   --line-2: rgba(0, 0, 0, 0.20);
   --line-strong: rgba(0, 0, 0, 0.30);
 
-  /* Acento: exclusivo de lo interactivo/seleccionado */
-  --accent: #007aff;
-  --accent-press: #0062cc;
+  /* Acento: exclusivo de lo interactivo/seleccionado. Coral vibrante de marca. */
+  --accent: #eb6445;
+  --accent-press: #c8553b;
   --accent-ink: #ffffff;
-  --accent-soft: rgba(0, 122, 255, 0.13);
-  --focus: rgba(0, 122, 255, 0.30);
+  --accent-soft: rgba(235, 100, 69, 0.14);
+  --focus: rgba(235, 100, 69, 0.32);
+
+  /* Azul ultramar de marca: wordmark, texto de énfasis, tarjeta destacada. */
+  --navy: #2e2c7e;
 
   /* Semánticos: exclusivos de estado (fondos con cuerpo, no lavados) */
   --green: #34c759;
@@ -52,9 +58,9 @@
   --teal: #0d9aa8;
   --teal-soft: rgba(13, 154, 168, 0.18);
 
-  /* Tarjeta destacada del dashboard. En claro casi-negro para resaltar sobre
-     el fondo claro; en oscuro se redefine para no fundirse con el panel. */
-  --hero-grad: linear-gradient(170deg, #2c2c2e, #1c1c1e);
+  /* Tarjeta destacada del dashboard: azul ultramar de marca. En oscuro se
+     redefine para no fundirse con el panel. */
+  --hero-grad: linear-gradient(170deg, #38358c, #201f57);
   --hero-ink: #ffffff;
   --hero-sub: rgba(235, 235, 245, 0.58);
 
@@ -73,7 +79,7 @@
 
   --ease: cubic-bezier(0.32, 0.72, 0, 1);
 
-  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
+  --font: 'Nunito', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
     'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas,
     'Cascadia Mono', 'Liberation Mono', monospace;
@@ -81,11 +87,11 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1c1c1e;
-    --sidebar: rgba(38, 38, 41, 0.72);
-    --sidebar-solid: #262629;
-    --panel: #1e1e20;
-    --panel-2: #252528;
+    --bg: #1a1a20;
+    --sidebar: rgba(37, 37, 44, 0.72);
+    --sidebar-solid: #25252c;
+    --panel: #1d1d22;
+    --panel-2: #26262d;
     --overlay: rgba(0, 0, 0, 0.5);
 
     --ink: #f5f5f7;
@@ -96,10 +102,12 @@
     --line-2: rgba(255, 255, 255, 0.18);
     --line-strong: rgba(255, 255, 255, 0.28);
 
-    --accent: #0a84ff;
-    --accent-press: #409cff;
-    --accent-soft: rgba(10, 132, 255, 0.18);
-    --focus: rgba(10, 132, 255, 0.42);
+    --accent: #f1795c;
+    --accent-press: #eb6445;
+    --accent-soft: rgba(241, 121, 92, 0.20);
+    --focus: rgba(241, 121, 92, 0.42);
+
+    --navy: #7f7cd6;
 
     --green: #30d158;
     --green-ink: #4fdb75;
@@ -116,9 +124,9 @@
     --teal: #40c8e0;
     --teal-soft: rgba(64, 200, 224, 0.16);
 
-    /* Azul apizarrado elevado: resalta como tarjeta destacada sobre el panel
-       oscuro, donde el casi-negro del tema claro se perdería. */
-    --hero-grad: linear-gradient(165deg, #35507f, #222f4c);
+    /* Azul ultramar de marca, aclarado: resalta como tarjeta destacada sobre
+       el panel oscuro, donde el tono del tema claro se perdería. */
+    --hero-grad: linear-gradient(165deg, #4d4aa8, #2e2c7e);
     --hero-ink: #ffffff;
     --hero-sub: rgba(235, 235, 245, 0.7);
 
@@ -235,6 +243,9 @@ h3 { font-size: 14px; }
 
 .btn-ok { color: var(--accent-ink); background: var(--green); border-color: transparent; }
 .btn-ok:hover { background: var(--green); filter: brightness(0.94); }
+
+.btn-danger-solid { color: var(--accent-ink); background: var(--red); border-color: transparent; }
+.btn-danger-solid:hover { background: var(--red); filter: brightness(0.94); }
 
 .btn-mov { color: var(--accent); }
 .btn-mov:hover { background: var(--accent-soft); }

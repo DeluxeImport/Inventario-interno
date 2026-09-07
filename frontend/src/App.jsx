@@ -8,6 +8,7 @@ import Icon from './components/common/Icon';
 import Inventario from './components/inventario/Inventario';
 import Movimientos from './components/movimientos/Movimientos';
 import Tickets from './components/tickets/Tickets';
+import Traspasos from './components/traspasos/Traspasos';
 import Dashboard from './components/dashboard/Dashboard';
 import Admin from './components/admin/Admin';
 import Actualizaciones from './components/actualizaciones/Actualizaciones';
@@ -17,6 +18,7 @@ const TITULOS = {
   inventario: 'Inventario',
   movimientos: 'Movimientos',
   tickets: 'Solicitudes',
+  traspasos: 'Traspasos',
   dashboard: 'Dashboard',
   admin: 'Administración',
   actualizaciones: 'Actualizaciones',
@@ -26,7 +28,7 @@ const TITULOS = {
 const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
 
 // Subtítulo de la barra de título: un dato útil sobre la vista, no un eslogan.
-function subtitulo(view, { stats, ticketsPend }) {
+function subtitulo(view, { stats, ticketsPend, traspasosPend, rol }) {
   if (view === 'inventario' && stats)
     return `${plural(stats.totalProductos, 'producto', 'productos')} en ${plural(
       Object.keys(stats.porCategoria).length,
@@ -43,7 +45,13 @@ function subtitulo(view, { stats, ticketsPend }) {
     return ticketsPend > 0
       ? `${plural(ticketsPend, 'solicitud pendiente', 'solicitudes pendientes')} de procesar`
       : 'Sin solicitudes pendientes';
-  if (view === 'movimientos') return 'Historial de entradas y salidas';
+  if (view === 'movimientos') return 'Historial de compras y salidas';
+  if (view === 'traspasos')
+    return traspasosPend > 0
+      ? rol === 'tienda'
+        ? `${plural(traspasosPend, 'traspaso por recibir', 'traspasos por recibir')}`
+        : `${plural(traspasosPend, 'traspaso pendiente', 'traspasos pendientes')} de resolver`
+      : 'Traspasos entre tiendas';
   if (view === 'admin') return 'Usuarios y bitácora de actividad';
   if (view === 'actualizaciones') return 'Novedades y cambios del sistema';
   if (view === 'manual') return 'Guía de uso descargable en PDF';
@@ -59,6 +67,7 @@ export default function App() {
   const [error, setError] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
   const [ticketsPend, setTicketsPend] = useState(0);
+  const [traspasosPend, setTraspasosPend] = useState(0);
 
   // Valida la sesión guardada al cargar.
   useEffect(() => {
@@ -82,13 +91,21 @@ export default function App() {
     if (user && puede(user.rol, 'dashboard')) api.stats().then(setStats).catch(() => {});
     api
       .tickets('PENDIENTE')
-      .then((t) => setTicketsPend(t.length))
+      .then((page) => setTicketsPend(page.total ?? page.items.length))
       .catch(() => {});
+    if (user && puede(user.rol, 'traspasos'))
+      api
+        .traspasos('PENDIENTE', undefined, undefined, undefined, user.rol === 'tienda' ? 'destino' : undefined)
+        .then((page) => setTraspasosPend(page.total ?? page.items.length))
+        .catch(() => {});
     setRefreshKey((k) => k + 1);
   }, [user]);
 
   useEffect(() => {
-    if (user) refrescarGlobal();
+    if (!user) return;
+    refrescarGlobal();
+    const timer = setInterval(refrescarGlobal, 30000);
+    return () => clearInterval(timer);
   }, [user, refrescarGlobal]);
 
   const onError = useCallback((msg) => {
@@ -114,7 +131,7 @@ export default function App() {
     if (k !== 'inventario' && k !== 'admin') refrescarGlobal();
   };
 
-  const sub = subtitulo(activeView, { stats, ticketsPend });
+  const sub = subtitulo(activeView, { stats, ticketsPend, traspasosPend, rol: user.rol });
 
   return (
     <div className="app">
@@ -124,6 +141,7 @@ export default function App() {
         activeView={activeView}
         stats={stats}
         ticketsPend={ticketsPend}
+        traspasosPend={traspasosPend}
         onSelect={onSelect}
         onLogout={logout}
       />
@@ -153,6 +171,9 @@ export default function App() {
           {activeView === 'tickets' && (
             <Tickets user={user} onError={onError} onChanged={refrescarGlobal} />
           )}
+          {activeView === 'traspasos' && (
+            <Traspasos user={user} onError={onError} onChanged={refrescarGlobal} />
+          )}
           {activeView === 'dashboard' && <Dashboard stats={stats} />}
           {activeView === 'admin' && user.rol === 'admin' && (
             <Admin currentUser={user} onError={onError} />
@@ -168,6 +189,7 @@ export default function App() {
         activeView={activeView}
         stats={stats}
         ticketsPend={ticketsPend}
+        traspasosPend={traspasosPend}
         onSelect={onSelect}
         onLogout={logout}
       />

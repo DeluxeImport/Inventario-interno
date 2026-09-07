@@ -9,7 +9,7 @@ const GUIA_URL = '/guia-solicitud.jpg';
 const CONTENIDO = [
   'Cómo iniciar sesión en cada portal (Administración, Áreas, Tiendas).',
   'Consultar el inventario, buscar y filtrar productos.',
-  'Registrar entradas y salidas de stock.',
+  'Registrar compras y salidas de stock.',
   'Crear una solicitud y cómo el administrador la procesa.',
   'Leer el panel y las alertas de reposición.',
   'Administrar usuarios y consultar la bitácora.',

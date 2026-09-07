@@ -1,5 +1,6 @@
 import Icon from './common/Icon';
 import { rolLabel, APP_NAME } from '../constants';
+import coralIcon from '../assets/coral-icon.png';
 
 // Icono de cada sección. Mantener sincronizado con TABS en constants.js.
 // Exportado para que la barra inferior móvil use los mismos iconos.
@@ -7,6 +8,7 @@ export const ICONOS = {
   inventario: 'caja',
   movimientos: 'transfer',
   tickets: 'ticket',
+  traspasos: 'intercambio',
   dashboard: 'grafico',
   admin: 'personas',
   actualizaciones: 'megafono',
@@ -30,7 +32,16 @@ const iniciales = (nombre = '') =>
     .join('')
     .toUpperCase() || '?';
 
-export default function Sidebar({ user, tabs, activeView, stats, ticketsPend, onSelect, onLogout }) {
+export default function Sidebar({
+  user,
+  tabs,
+  activeView,
+  stats,
+  ticketsPend,
+  traspasosPend,
+  onSelect,
+  onLogout,
+}) {
   const alertasStock = (stats?.bajoMinimo || 0) + (stats?.agotados || 0);
   const grupos = [];
   for (const tab of tabs) {
@@ -45,12 +56,12 @@ export default function Sidebar({ user, tabs, activeView, stats, ticketsPend, on
   return (
     <aside className="sidebar">
       <div className="brand">
-        <span className="logo">
-          <Icon name="caja" size={16} strokeWidth={1.8} />
+        <span className="brand-chip">
+          <img src={coralIcon} alt="" />
         </span>
         <div>
-          <h1>{APP_NAME}</h1>
-          <p>Control interno</p>
+          <p className="brand-word">Coral</p>
+          <p className="brand-tagline">{APP_NAME}</p>
         </div>
       </div>
 
@@ -72,6 +83,9 @@ export default function Sidebar({ user, tabs, activeView, stats, ticketsPend, on
               {k === 'dashboard' && alertasStock > 0 && <span className="dot">{alertasStock}</span>}
               {k === 'tickets' && ticketsPend > 0 && (
                 <span className="dot dot--alerta">{ticketsPend}</span>
+              )}
+              {k === 'traspasos' && traspasosPend > 0 && (
+                <span className="dot dot--alerta">{traspasosPend}</span>
               )}
             </button>
           ))}

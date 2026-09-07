@@ -46,3 +46,9 @@ export const soloSolicitante = (req, _res, next) => {
     throw forbidden('Solo tiendas y líderes de área pueden crear solicitudes.');
   next();
 };
+
+// Solo tiendas (los traspasos son de tienda a tienda, no involucran áreas).
+export const soloTienda = (req, _res, next) => {
+  if (req.user.rol !== ROLES.TIENDA) throw forbidden('Solo las tiendas pueden crear traspasos.');
+  next();
+};

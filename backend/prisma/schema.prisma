@@ -16,13 +16,15 @@ model Producto {
   stockIncompleto Int          @default(0)
   stockMinimo     Int          @default(0)
   unidadesPorPaquete Int       @default(1) // cuántas unidades trae un paquete (para solicitudes por paquete)
+  precio          Float        @default(0) // precio unitario
   solicitable     Boolean      @default(false)
   movimientos     Movimiento[]
   ticketItems     TicketItem[]
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
-  @@index([categoria])
+  // Listado paginado: filtro por categoría + orden estable por nombre/id.
+  @@index([categoria, producto, id])
 }
 
 model Movimiento {
@@ -36,25 +38,45 @@ model Movimiento {
   observacion String?
   fecha       DateTime @default(now())
 
-  @@index([productoId])
-  @@index([fecha])
+  // Historial filtrado por producto y fecha.
+  @@index([productoId, fecha, id])
+  @@index([fecha, id])
+  @@index([tipo, fecha, id])
 }
 
 model Usuario {
-  id                 Int         @id @default(autoincrement())
-  username           String      @unique
-  nombre             String
-  passwordHash       String
-  rol                String      @default("usuario") // admin | usuario | tienda | lider
-  tienda             String? // nombre de la tienda (para usuarios rol "tienda")
-  area               String? // área (para usuarios rol "lider": RR.HH | Marketing | Logística | Sistemas)
-  activo             Boolean     @default(true)
-  ultimoLogin        DateTime?
-  ultimaIp           String?
-  createdAt          DateTime    @default(now())
-  actividades        Actividad[]
-  ticketsSolicitados Ticket[]    @relation("ticketSolicitante")
-  ticketsAtendidos   Ticket[]    @relation("ticketAtendido")
+  id                    Int         @id @default(autoincrement())
+  username              String      @unique
+  nombre                String
+  passwordHash          String
+  rol                   String      @default("usuario") // admin | usuario | tienda | lider
+  tienda                String? // nombre de la tienda (para usuarios rol "tienda")
+  area                  String? // área (para usuarios rol "lider": RR.HH | Marketing | Logística | Sistemas)
+  activo                Boolean     @default(true)
+  ultimoLogin           DateTime?
+  ultimaIp              String?
+  createdAt             DateTime    @default(now())
+  actividades           Actividad[]
+  ticketsSolicitados    Ticket[]    @relation("ticketSolicitante")
+  ticketsAtendidos      Ticket[]    @relation("ticketAtendido")
+  traspasosSolicitados  Traspaso[]  @relation("traspasoSolicitante")
+  traspasosAtendidos    Traspaso[]  @relation("traspasoAtendido")
+  pushSuscripciones     PushSuscripcion[]
+}
+
+// Suscripción push del navegador de un usuario (uno por dispositivo/navegador).
+// El endpoint es único: si el usuario se vuelve a suscribir desde el mismo
+// navegador, se reemplaza en vez de duplicar.
+model PushSuscripcion {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  @@index([usuarioId])
 }
 
 model Actividad {
@@ -66,8 +88,9 @@ model Actividad {
   ip        String?
   fecha     DateTime @default(now())
 
-  @@index([usuarioId])
-  @@index([fecha])
+  @@index([usuarioId, id])
+  @@index([fecha, id])
+  @@index([accion, id]) // historial ERP de traspasos: filtra por accion ("ERP traspaso <id>")
 }
 
 model Ticket {
@@ -85,9 +108,43 @@ model Ticket {
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
-  @@index([solicitanteId])
-  @@index([estado])
-  @@index([createdAt])
+  // Listados paginados del solicitante y de administración.
+  @@index([solicitanteId, createdAt, id])
+  @@index([solicitanteId, estado, createdAt, id])
+  @@index([estado, createdAt, id])
+  @@index([createdAt, id])
+}
+
+// Traspaso de un producto entre dos tiendas, negociado directamente entre
+// ellas (sin pasar por almacén ni por el catálogo de Producto: es una
+// descripción libre, porque suele tratarse de artículos externos al
+// inventario). El admin/almacén solo lo mira para replicarlo en el ERP real;
+// `copiadoErp` es su checklist personal, no bloquea nada del flujo.
+model Traspaso {
+  id             Int      @id @default(autoincrement())
+  origenTienda   String // tienda que crea el traspaso y lo envía
+  destinoTienda  String // tienda que debe aceptarlo
+  producto       String // descripción libre (no ligado al catálogo de Producto)
+  codigoProducto String // código/SKU del producto, para calzar con el ERP real
+  cantidad       Int
+  unidad         String?
+  nota           String?
+  fotoUrl        String? // opcional, evidencia del producto
+  estado         String   @default("PENDIENTE") // PENDIENTE | ACEPTADO | RECHAZADO | CANCELADO
+  motivoRechazo  String?
+  copiadoErp     Boolean  @default(false) // admin/almacén: ya lo replicó en el ERP real
+  solicitanteId  Int
+  solicitante    Usuario  @relation("traspasoSolicitante", fields: [solicitanteId], references: [id], onDelete: Cascade)
+  atendidoPorId  Int?
+  atendidoPor    Usuario? @relation("traspasoAtendido", fields: [atendidoPorId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Listados por tienda (origen o destino) y por estado.
+  @@index([origenTienda, createdAt, id])
+  @@index([destinoTienda, createdAt, id])
+  @@index([estado, createdAt, id])
+  @@index([createdAt, id])
 }
 
 model TicketItem {

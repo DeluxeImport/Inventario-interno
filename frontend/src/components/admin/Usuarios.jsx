@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../api/client';
 import { fmtFecha } from '../../lib/format';
+import { useConfirm } from '../../hooks/useConfirm';
 import Icon from '../common/Icon';
 import UsuarioModal from './UsuarioModal';
 
@@ -15,6 +16,7 @@ const ROL_LABEL = {
 const rolClase = (rol) => (rol === 'admin' ? 'badge-area' : 'badge-neutral');
 
 export default function Usuarios({ currentUser, onError }) {
+  const confirmar = useConfirm();
   const [usuarios, setUsuarios] = useState([]);
   const [editing, setEditing] = useState(null);
 
@@ -31,7 +33,12 @@ export default function Usuarios({ currentUser, onError }) {
   }, [cargar]);
 
   const borrar = async (u) => {
-    if (!confirm(`¿Eliminar al usuario "${u.username}"? Se borrará también su bitácora.`)) return;
+    const ok = await confirmar({
+      title: `Eliminar usuario "${u.username}"`,
+      message: 'Se borrará también su bitácora de actividad. Esta acción no se puede deshacer.',
+      confirmLabel: 'Eliminar',
+    });
+    if (!ok) return;
     try {
       await api.borrarUsuario(u.id);
       cargar();
