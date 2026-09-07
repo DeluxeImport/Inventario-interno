@@ -3,10 +3,19 @@ import { notFound, badRequest, forbidden } from '../lib/AppError.js';
 import { ROLES, TRASPASO_ESTADOS } from '../constants/index.js';
 import { decodeCursor, pageResult } from '../lib/pagination.js';
 import { clampLimit } from '../utils/index.js';
-import { TIENDAS } from '../data/tiendas.js';
 
-const NOMBRES_TIENDA = TIENDAS.map((t) => t.nombre);
 const ALMACEN_ROLES = [ROLES.ADMIN, ROLES.USUARIO];
+
+// Fuente única de verdad de qué tiendas existen: los usuarios activos con rol
+// "tienda" en la base de datos (no una lista estática que puede desincronizarse
+// cuando el admin crea una tienda nueva desde el panel de Usuarios).
+async function tiendaExiste(nombre) {
+  const u = await prisma.usuario.findFirst({
+    where: { rol: ROLES.TIENDA, tienda: nombre, activo: true },
+    select: { id: true },
+  });
+  return Boolean(u);
+}
 
 const includeTraspaso = {
   solicitante: { select: { nombre: true, username: true, tienda: true } },
@@ -71,8 +80,8 @@ export async function listar(user, { estado, limit, cursor, copiadoErp, direccio
 
 export async function crear(user, { destinoTienda, producto, codigoProducto, cantidad, unidad, nota }) {
   if (!user.tienda) throw badRequest('Tu usuario no tiene una tienda asignada.');
-  if (!NOMBRES_TIENDA.includes(destinoTienda)) throw badRequest('Tienda destino inválida.');
   if (destinoTienda === user.tienda) throw badRequest('No puedes traspasar a tu propia tienda.');
+  if (!(await tiendaExiste(destinoTienda))) throw badRequest('Tienda destino inválida.');
 
   const t = await prisma.traspaso.create({
     data: {

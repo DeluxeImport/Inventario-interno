@@ -90,7 +90,7 @@ export default function NuevoTraspasoModal({ user, onClose, onSaved, onError }) 
                 Selecciona una tienda…
               </option>
               {tiendas.map((t) => (
-                <option key={t.slug} value={t.nombre}>
+                <option key={t.nombre} value={t.nombre}>
                   {t.nombre}
                 </option>
               ))}
