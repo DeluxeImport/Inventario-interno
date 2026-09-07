@@ -130,8 +130,19 @@ test('productoCrearSchema: acepta stock cero y datos válidos', () => {
     producto: 'Lápiz',
     stockCompleto: 0,
     stockMinimo: 3,
+    precio: 2.5,
   });
   assert.equal(r.success, true);
+});
+
+test('productoCrearSchema: rechaza precio negativo', () => {
+  const r = productoCrearSchema.safeParse({
+    categoria: 'Papelería',
+    producto: 'Lápiz',
+    precio: -1,
+  });
+  assert.equal(r.success, false);
+  assert.match(r.error.issues[0].message, /precio no puede ser negativo/i);
 });
 
 test('usuarioCrearSchema: rechaza un rol inválido', () => {
@@ -208,6 +219,36 @@ test('buildConfig: normaliza lista de CORS_ORIGIN cuando está configurado', () 
     CORS_ORIGIN: 'https://a.com, https://b.com ',
   });
   assert.deepEqual(cfg.corsOrigin, ['https://a.com', 'https://b.com']);
+});
+
+test('buildConfig: WhatsApp queda desactivado si falta alguna credencial', () => {
+  const cfg = buildConfig({
+    DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
+    NODE_ENV: 'development',
+    JWT_SECRET: 'a'.repeat(32),
+    CALLMEBOT_PHONE: '+51987654321',
+  });
+  assert.deepEqual(cfg.whatsapp, {
+    enabled: false,
+    phone: '+51987654321',
+    apikey: null,
+  });
+});
+
+test('buildConfig: WhatsApp se activa con teléfono y API key', () => {
+  const cfg = buildConfig({
+    DATABASE_URL: 'postgresql://user:pass@localhost:5432/db',
+    NODE_ENV: 'production',
+    JWT_SECRET: 'a'.repeat(32),
+    CORS_ORIGIN: 'https://inventario.example.com',
+    CALLMEBOT_PHONE: ' +51987654321 ',
+    CALLMEBOT_APIKEY: ' 123456 ',
+  });
+  assert.deepEqual(cfg.whatsapp, {
+    enabled: true,
+    phone: '+51987654321',
+    apikey: '123456',
+  });
 });
 
 test('soloAlmacen: rechaza roles desconocidos en vez de heredarlos como almacén', () => {

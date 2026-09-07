@@ -13,8 +13,8 @@ const schema = z.object({
   JWT_EXPIRES_IN: z.string().default('12h'),
   CORS_ORIGIN: z.string().optional(),
   // Notificaciones por WhatsApp vía CallMeBot (opcional). Si faltan, se desactiva.
-  CALLMEBOT_PHONE: z.string().optional(),
-  CALLMEBOT_APIKEY: z.string().optional(),
+  CALLMEBOT_PHONE: z.string().trim().optional(),
+  CALLMEBOT_APIKEY: z.string().trim().optional(),
   // Notificaciones push del navegador (opcional). Si faltan, se desactiva.
   VAPID_PUBLIC_KEY: z.string().optional(),
   VAPID_PRIVATE_KEY: z.string().optional(),
