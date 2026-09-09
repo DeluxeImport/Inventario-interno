@@ -58,6 +58,7 @@ const PATHS = {
   intercambio: <><path d="M3.6 8.2h14.6" /><path d="m13.8 3.8 4.4 4.4-4.4 4.4" /><path d="M20.4 15.8H5.8" /><path d="m10.2 20.2-4.4-4.4 4.4-4.4" /></>,
 
   portapapeles: <><rect x="7.2" y="5.2" width="9.6" height="15.2" rx="1.6" /><path d="M9.6 5.2V4a1.2 1.2 0 0 1 1.2-1.2h2.4A1.2 1.2 0 0 1 14.4 4v1.2" /></>,
+  camara: <><path d="M4 8.4a1.6 1.6 0 0 1 1.6-1.6h2l1-1.6h6.8l1 1.6h2A1.6 1.6 0 0 1 20 8.4v9.2a1.6 1.6 0 0 1-1.6 1.6H5.6A1.6 1.6 0 0 1 4 17.6Z" /><circle cx="12" cy="13" r="3.4" /></>,
 };
 
 export default function Icon({ name, size = 16, title, className, strokeWidth = 1.6 }) {

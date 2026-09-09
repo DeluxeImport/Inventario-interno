@@ -580,6 +580,32 @@ th.col-acciones, td.actions { width: 1%; white-space: nowrap; }
 .compra-detalle { padding: 10px 16px 4px; }
 .compra-detalle table { font-size: 12.5px; }
 .cart-price { font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+/* ---------------- Nuevo traspaso (carrito multi-producto) ---------------- */
+
+.add-foto {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  overflow: hidden;
+  color: var(--ink-3);
+  background: var(--panel);
+  border: 0.5px solid var(--line);
+  border-radius: var(--r-control);
+  cursor: pointer;
+}
+.add-foto:hover { color: var(--ink-2); background: var(--panel-2); }
+.add-foto input[type='file'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.cart-thumb { flex: none; width: 32px; height: 32px; object-fit: cover; border-radius: 6px; }
 .compra-total {
   display: flex;
   justify-content: space-between;
