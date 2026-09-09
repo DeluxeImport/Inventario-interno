@@ -96,7 +96,7 @@ export default function Movimientos({ onError, refreshKey, onChanged }) {
         </div>
         <select value={tipo} onChange={(e) => setTipo(e.target.value)} aria-label="Tipo de movimiento">
           <option value="">Todos</option>
-          <option value="ENTRADA">Registros de compra</option>
+          <option value="ENTRADA">Entradas</option>
           <option value="SALIDA">Salidas</option>
         </select>
         {hayFiltros && (
@@ -135,7 +135,7 @@ export default function Movimientos({ onError, refreshKey, onChanged }) {
                   className={`badge badge--icono badge-${m.tipo === 'ENTRADA' ? 'ok' : 'mov'}`}
                 >
                   <Icon name={m.tipo === 'ENTRADA' ? 'entrada' : 'salida'} size={12} />
-                  {m.tipo === 'ENTRADA' ? 'Registro de compra' : 'Salida'}
+                  {m.tipo === 'ENTRADA' ? 'Entrada' : 'Salida'}
                 </span>
               </td>
               <td data-label="Cantidad" className="num strong">{m.cantidad}</td>

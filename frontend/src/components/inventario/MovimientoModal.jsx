@@ -48,7 +48,7 @@ export default function MovimientoModal({ producto, onClose, onSaved, onError })
             aria-pressed={tipo === 'ENTRADA'}
           >
             <Icon name="entrada" size={13} />
-            Registro de compra
+            Entrada
           </button>
           <button
             type="button"
