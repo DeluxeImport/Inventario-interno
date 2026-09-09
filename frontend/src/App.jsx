@@ -7,6 +7,7 @@ import BottomNav from './components/BottomNav';
 import Icon from './components/common/Icon';
 import Inventario from './components/inventario/Inventario';
 import Movimientos from './components/movimientos/Movimientos';
+import Compras from './components/compras/Compras';
 import Tickets from './components/tickets/Tickets';
 import Traspasos from './components/traspasos/Traspasos';
 import Dashboard from './components/dashboard/Dashboard';
@@ -17,6 +18,7 @@ import Manual from './components/manual/Manual';
 const TITULOS = {
   inventario: 'Inventario',
   movimientos: 'Movimientos',
+  compras: 'Compras',
   tickets: 'Solicitudes',
   traspasos: 'Traspasos',
   dashboard: 'Dashboard',
@@ -45,7 +47,8 @@ function subtitulo(view, { stats, ticketsPend, traspasosPend, rol }) {
     return ticketsPend > 0
       ? `${plural(ticketsPend, 'solicitud pendiente', 'solicitudes pendientes')} de procesar`
       : 'Sin solicitudes pendientes';
-  if (view === 'movimientos') return 'Historial de compras y salidas';
+  if (view === 'movimientos') return 'Historial de entradas y salidas';
+  if (view === 'compras') return 'Registro de compras a proveedores';
   if (view === 'traspasos')
     return traspasosPend > 0
       ? rol === 'tienda'
@@ -167,6 +170,9 @@ export default function App() {
           )}
           {activeView === 'movimientos' && (
             <Movimientos onError={onError} refreshKey={refreshKey} onChanged={refrescarGlobal} />
+          )}
+          {activeView === 'compras' && (
+            <Compras onError={onError} onChanged={refrescarGlobal} />
           )}
           {activeView === 'tickets' && (
             <Tickets user={user} onError={onError} onChanged={refrescarGlobal} />

@@ -28,20 +28,40 @@ model Producto {
 }
 
 model Movimiento {
-  id          Int      @id @default(autoincrement())
-  productoId  Int
-  producto    Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
-  tipo        String // ENTRADA | SALIDA
-  cantidad    Int
-  destino     String? // tienda o área a la que se entregó (salida)
-  responsable String?
-  observacion String?
-  fecha       DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  productoId    Int
+  producto      Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
+  tipo          String // ENTRADA | SALIDA
+  cantidad      Int
+  destino       String? // tienda o área a la que se entregó (salida)
+  responsable   String?
+  observacion   String?
+  fecha         DateTime @default(now())
+  compraId      Int? // si esta ENTRADA vino de una Compra registrada (línea de esa compra)
+  compra        Compra?  @relation(fields: [compraId], references: [id], onDelete: SetNull)
+  precioUnitario Float? // costo de compra de esta línea (solo informativo, no toca Producto.precio)
 
   // Historial filtrado por producto y fecha.
   @@index([productoId, fecha, id])
   @@index([fecha, id])
   @@index([tipo, fecha, id])
+  @@index([compraId])
+}
+
+// Compra a un proveedor, agrupando una o más entradas de stock (Movimiento
+// tipo ENTRADA) para poder ver cuánto se gastó y en qué, sin afectar el
+// precio de venta del producto (ese se sigue editando aparte, a mano).
+model Compra {
+  id           Int          @id @default(autoincrement())
+  proveedor    String
+  comprobante  String? // número de boleta/factura, opcional
+  observacion  String?
+  total        Float // suma de cantidad * precioUnitario de sus líneas, calculada al crear
+  registradoPor String
+  movimientos  Movimiento[]
+  fecha        DateTime     @default(now())
+
+  @@index([fecha, id])
 }
 
 model Usuario {

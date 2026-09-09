@@ -61,6 +61,22 @@ export const movimientoSchema = z.object({
   observacion: z.string().optional(),
 });
 
+// ----- Compras -----
+export const compraCrearSchema = z.object({
+  proveedor: z.string().trim().min(1, 'Ingresa el proveedor.'),
+  comprobante: z.string().trim().optional(),
+  observacion: z.string().optional(),
+  items: z
+    .array(
+      z.object({
+        productoId: z.coerce.number().int().positive('Producto inválido en la compra.'),
+        cantidad: z.coerce.number().int().positive('La cantidad debe ser mayor a 0.'),
+        precioUnitario: z.coerce.number().min(0, 'El precio no puede ser negativo.'),
+      })
+    )
+    .min(1, 'Agrega al menos un producto a la compra.'),
+});
+
 // ----- Usuarios -----
 export const usuarioCrearSchema = z.object({
   username: z.string().trim().min(1, OBLIGATORIO_USUARIO),

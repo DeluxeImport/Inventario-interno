@@ -36,4 +36,12 @@ router.get(
   asyncHandler(async (_req, res) => res.json(await productos.solicitables()))
 );
 
+// Lista simple de todos los productos, para el buscador de "Nueva compra".
+router.get(
+  '/productos-lista',
+  auth,
+  soloAlmacen,
+  asyncHandler(async (_req, res) => res.json(await productos.listaSimple()))
+);
+
 export default router;

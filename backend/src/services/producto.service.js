@@ -84,6 +84,17 @@ export async function eliminar(id) {
   return prisma.producto.delete({ where: { id } });
 }
 
+// Lista liviana de TODOS los productos (sin paginar), para el buscador de la
+// canasta de "Nueva compra": cualquier producto puede comprarse, no solo los
+// marcados como solicitables.
+export async function listaSimple() {
+  const productos = await prisma.producto.findMany({
+    select: { id: true, categoria: true, producto: true, unidad: true, stockCompleto: true },
+    orderBy: [{ categoria: 'asc' }, { producto: 'asc' }],
+  });
+  return productos;
+}
+
 export async function solicitables() {
   const productos = await prisma.producto.findMany({
     where: { solicitable: true },

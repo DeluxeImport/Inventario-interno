@@ -10,6 +10,7 @@ import { errorHandler, notFoundHandler } from './lib/errorHandler.js';
 import authRoutes from './routes/auth.routes.js';
 import productosRoutes from './routes/productos.routes.js';
 import movimientosRoutes from './routes/movimientos.routes.js';
+import comprasRoutes from './routes/compras.routes.js';
 import ticketsRoutes from './routes/tickets.routes.js';
 import traspasosRoutes from './routes/traspasos.routes.js';
 import usuariosRoutes from './routes/usuarios.routes.js';
@@ -45,6 +46,7 @@ export function createApp() {
   app.use('/api/auth', authRoutes);
   app.use('/api/productos', productosRoutes);
   app.use('/api/movimientos', movimientosRoutes);
+  app.use('/api/compras', comprasRoutes);
   app.use('/api/tickets', ticketsRoutes);
   app.use('/api/traspasos', traspasosRoutes);
   app.use('/api/usuarios', usuariosRoutes);

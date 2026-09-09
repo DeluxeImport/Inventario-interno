@@ -41,52 +41,60 @@ export function listar({ productoId, limit, cursor, desde, hasta, tipo } = {}) {
   });
 }
 
-// Registra entrada/salida ajustando el stock de forma atómica.
-export async function registrar(data, responsablePorDefecto) {
-  const { productoId, tipo, cantidad, responsable, observacion, destino } = data;
+// Ajusta el stock de un producto y crea su Movimiento, de forma atómica dentro
+// de la transacción `tx` recibida. Es el único lugar que toca stockCompleto por
+// un movimiento: lo usan tanto un alta suelta (registrar) como cada línea de
+// una Compra (compra.service.js), para no duplicar el ajuste de stock.
+export async function ajustarStockYMovimiento(tx, data, responsablePorDefecto) {
+  const { productoId, tipo, cantidad, responsable, observacion, destino, compraId, precioUnitario } = data;
   const cant = Number(cantidad);
   if (!productoId || ![MOV_TIPOS.ENTRADA, MOV_TIPOS.SALIDA].includes(tipo) || !cant || cant <= 0)
     throw badRequest('Datos del movimiento inválidos.');
 
-  return prisma.$transaction(async (tx) => {
-    const prod = await tx.producto.findUnique({ where: { id: Number(productoId) } });
-    if (!prod) throw notFound('Producto no encontrado.');
+  const prod = await tx.producto.findUnique({ where: { id: Number(productoId) } });
+  if (!prod) throw notFound('Producto no encontrado.');
 
-    // Ajuste atómico del stock (increment/decrement) para evitar lost-updates entre
-    // movimientos concurrentes. En SALIDA el guard `gte` impide dejar el stock negativo.
-    if (tipo === MOV_TIPOS.SALIDA) {
-      const res = await tx.producto.updateMany({
-        where: { id: prod.id, stockCompleto: { gte: cant } },
-        data: { stockCompleto: { decrement: cant } },
-      });
-      if (res.count === 0)
-        throw badRequest(`Stock insuficiente. Disponible (completo): ${prod.stockCompleto}`);
-    } else {
-      await tx.producto.update({
-        where: { id: prod.id },
-        data: { stockCompleto: { increment: cant } },
-      });
-    }
-    const updated = await tx.producto.findUnique({ where: { id: prod.id } });
-    const mov = await tx.movimiento.create({
-      data: {
-        productoId: prod.id,
-        tipo,
-        cantidad: cant,
-        destino: destino?.trim() || null,
-        responsable: responsable?.trim() || responsablePorDefecto,
-        observacion: observacion?.trim() || null,
-      },
+  // Ajuste atómico del stock (increment/decrement) para evitar lost-updates entre
+  // movimientos concurrentes. En SALIDA el guard `gte` impide dejar el stock negativo.
+  if (tipo === MOV_TIPOS.SALIDA) {
+    const res = await tx.producto.updateMany({
+      where: { id: prod.id, stockCompleto: { gte: cant } },
+      data: { stockCompleto: { decrement: cant } },
     });
-    const producto = withEstado(updated);
-    // Alerta solo cuando el movimiento EMPEORA el estado (evita avisar de nuevo
-    // si el producto ya estaba en stock bajo). La notificación la dispara la ruta.
-    const estadoAntes = withEstado(prod).estado;
-    const alertaStock =
-      (estadoAntes === STOCK_ESTADOS.OK && producto.estado !== STOCK_ESTADOS.OK) ||
-      (estadoAntes === STOCK_ESTADOS.BAJO && producto.estado === STOCK_ESTADOS.AGOTADO);
-    return { mov, producto, alertaStock };
+    if (res.count === 0)
+      throw badRequest(`Stock insuficiente. Disponible (completo): ${prod.stockCompleto}`);
+  } else {
+    await tx.producto.update({
+      where: { id: prod.id },
+      data: { stockCompleto: { increment: cant } },
+    });
+  }
+  const updated = await tx.producto.findUnique({ where: { id: prod.id } });
+  const mov = await tx.movimiento.create({
+    data: {
+      productoId: prod.id,
+      tipo,
+      cantidad: cant,
+      destino: destino?.trim() || null,
+      responsable: responsable?.trim() || responsablePorDefecto,
+      observacion: observacion?.trim() || null,
+      compraId: compraId || null,
+      precioUnitario: precioUnitario != null ? Number(precioUnitario) : null,
+    },
   });
+  const producto = withEstado(updated);
+  // Alerta solo cuando el movimiento EMPEORA el estado (evita avisar de nuevo
+  // si el producto ya estaba en stock bajo). La notificación la dispara la ruta.
+  const estadoAntes = withEstado(prod).estado;
+  const alertaStock =
+    (estadoAntes === STOCK_ESTADOS.OK && producto.estado !== STOCK_ESTADOS.OK) ||
+    (estadoAntes === STOCK_ESTADOS.BAJO && producto.estado === STOCK_ESTADOS.AGOTADO);
+  return { mov, producto, alertaStock };
+}
+
+// Registra entrada/salida ajustando el stock de forma atómica.
+export async function registrar(data, responsablePorDefecto) {
+  return prisma.$transaction((tx) => ajustarStockYMovimiento(tx, data, responsablePorDefecto));
 }
 
 // Elimina un movimiento y revierte su efecto en el stock (de forma atómica).

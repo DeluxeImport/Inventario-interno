@@ -113,6 +113,17 @@ export const api = {
   crearMovimiento: (data) => req('/movimientos', { method: 'POST', body: JSON.stringify(data) }),
   borrarMovimiento: (id) => req(`/movimientos/${id}`, { method: 'DELETE' }),
 
+  // Compras (proveedor + varios productos a la vez, para saber cuánto se gasta)
+  productosLista: () => req('/productos-lista'),
+  compras: ({ cursor, desde, hasta, limit = 30 } = {}) => {
+    const qs = new URLSearchParams({ limit: String(limit) });
+    if (cursor) qs.set('cursor', cursor);
+    if (desde) qs.set('desde', desde);
+    if (hasta) qs.set('hasta', hasta);
+    return req(`/compras?${qs}`).then(normalizePage);
+  },
+  crearCompra: (data) => req('/compras', { method: 'POST', body: JSON.stringify(data) }),
+
   // Tickets / solicitudes
   solicitables: () => req('/solicitables'),
   tickets: (estado, cursor, limit = 40) => {

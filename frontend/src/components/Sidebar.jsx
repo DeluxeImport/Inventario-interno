@@ -7,6 +7,7 @@ import coralIcon from '../assets/coral-icon.png';
 export const ICONOS = {
   inventario: 'caja',
   movimientos: 'transfer',
+  compras: 'entrada',
   tickets: 'ticket',
   traspasos: 'intercambio',
   dashboard: 'grafico',

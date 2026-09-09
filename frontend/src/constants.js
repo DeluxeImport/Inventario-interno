@@ -18,8 +18,8 @@ export const esSolicitante = (rol) => REQUESTER_ROLES.includes(rol);
 // los ve cualquier usuario con sesión.
 const AYUDA = ['actualizaciones', 'manual'];
 export const PERMISOS = {
-  admin: ['inventario', 'movimientos', 'tickets', 'traspasos', 'dashboard', 'admin', ...AYUDA],
-  usuario: ['inventario', 'movimientos', 'tickets', 'traspasos', 'dashboard', ...AYUDA],
+  admin: ['inventario', 'movimientos', 'compras', 'tickets', 'traspasos', 'dashboard', 'admin', ...AYUDA],
+  usuario: ['inventario', 'movimientos', 'compras', 'tickets', 'traspasos', 'dashboard', ...AYUDA],
   tienda: ['tickets', 'traspasos', ...AYUDA],
   lider: ['tickets', ...AYUDA],
 };
@@ -29,6 +29,7 @@ export const puede = (rol, modulo) => (PERMISOS[rol] || []).includes(modulo);
 export const TABS = [
   ['inventario', 'Inventario'],
   ['movimientos', 'Movimientos'],
+  ['compras', 'Compras'],
   ['tickets', 'Tickets'],
   ['traspasos', 'Traspasos'],
   ['dashboard', 'Dashboard'],
