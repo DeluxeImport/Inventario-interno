@@ -9,6 +9,15 @@ const includeCompra = {
   movimientos: { include: { producto: { select: { producto: true, unidad: true } } } },
 };
 
+// Total SIEMPRE en vivo, a partir de las líneas que realmente existen ahora
+// (nunca un valor guardado): si una línea se borra desde Movimientos o su
+// producto se elimina (cascada), el total refleja eso automáticamente, sin
+// poder quedar desincronizado.
+const conTotal = (compra) => ({
+  ...compra,
+  total: compra.movimientos.reduce((acc, m) => acc + m.cantidad * (m.precioUnitario ?? 0), 0),
+});
+
 const esCursorCompra = (c) =>
   c && typeof c.fecha === 'string' && !Number.isNaN(Date.parse(c.fecha)) &&
   Number.isInteger(c.id) && c.id > 0;
@@ -38,27 +47,25 @@ export async function listar({ limit, cursor, desde, hasta } = {}) {
     orderBy: [{ fecha: 'desc' }, { id: 'desc' }],
     take: pageSize + 1,
   });
-  return pageResult(rows, pageSize, ({ fecha, id }) => ({ fecha: fecha.toISOString(), id }));
+  const page = pageResult(rows, pageSize, ({ fecha, id }) => ({ fecha: fecha.toISOString(), id }));
+  return { ...page, items: page.items.map(conTotal) };
 }
 
 export async function obtener(id) {
   const compra = await prisma.compra.findUnique({ where: { id }, include: includeCompra });
   if (!compra) throw notFound('Compra no encontrada.');
-  return compra;
+  return conTotal(compra);
 }
 
 // Crea la Compra y una línea (Movimiento ENTRADA) por cada ítem, todo en una
 // sola transacción: si un producto no existe o algo falla, no queda nada a medias.
 export async function crear({ proveedor, comprobante, observacion, items }, registradoPor) {
-  const total = items.reduce((acc, it) => acc + Number(it.cantidad) * Number(it.precioUnitario), 0);
-
   return prisma.$transaction(async (tx) => {
     const compra = await tx.compra.create({
       data: {
         proveedor: proveedor.trim(),
         comprobante: comprobante?.trim() || null,
         observacion: observacion?.trim() || null,
-        total,
         registradoPor,
       },
     });
@@ -76,6 +83,7 @@ export async function crear({ proveedor, comprobante, observacion, items }, regi
       resultados.push(r);
     }
 
-    return { compra, resultados };
+    const total = items.reduce((acc, it) => acc + Number(it.cantidad) * Number(it.precioUnitario), 0);
+    return { compra, resultados, total };
   });
 }

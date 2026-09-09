@@ -51,12 +51,14 @@ model Movimiento {
 // Compra a un proveedor, agrupando una o más entradas de stock (Movimiento
 // tipo ENTRADA) para poder ver cuánto se gastó y en qué, sin afectar el
 // precio de venta del producto (ese se sigue editando aparte, a mano).
+// El total NO se guarda aquí: se calcula siempre en vivo a partir de sus
+// `movimientos` (cantidad * precioUnitario), para que nunca pueda desincronizarse
+// si una línea se borra (desde Movimientos) o su producto se elimina (cascada).
 model Compra {
   id           Int          @id @default(autoincrement())
   proveedor    String
   comprobante  String? // número de boleta/factura, opcional
   observacion  String?
-  total        Float // suma de cantidad * precioUnitario de sus líneas, calculada al crear
   registradoPor String
   movimientos  Movimiento[]
   fecha        DateTime     @default(now())

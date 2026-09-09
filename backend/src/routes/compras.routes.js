@@ -28,11 +28,11 @@ router.post(
   '/',
   validate(compraCrearSchema),
   asyncHandler(async (req, res) => {
-    const { compra, resultados } = await compras.crear(req.body, req.user.nombre);
+    const { compra, resultados, total } = await compras.crear(req.body, req.user.nombre);
     await actividad.registrar(
       req.user.id,
       'Registró compra',
-      `${req.body.proveedor}: ${resultados.length} producto(s), total S/ ${compra.total.toFixed(2)}`,
+      `${req.body.proveedor}: ${resultados.length} producto(s), total S/ ${total.toFixed(2)}`,
       getIp(req)
     );
     for (const r of resultados) {
